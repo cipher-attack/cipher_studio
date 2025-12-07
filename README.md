@@ -7,7 +7,7 @@
   <p><strong>"Red Teaming the Metaverse."</strong></p>
 
   <a href="https://x.com/Cipher_attacks"><img src="https://img.shields.io/badge/X-Twitter-black?style=for-the-badge&logo=x" alt="Twitter"/></a>
-  <a href="https://www.youtube.com/@cipher-atack"><img src="https://img.shields.io/badge/YouTube-Subscribe-red?style=for-the-badge&logo=youtube" alt="YouTube"/></a>
+  <a href="https://www.youtube.com/@cipher-attack"><img src="https://img.shields.io/badge/YouTube-Subscribe-red?style=for-the-badge&logo=youtube" alt="YouTube"/></a>
   <a href="https://github.com/cipher-attack"><img src="https://img.shields.io/badge/GitHub-Repo-gray?style=for-the-badge&logo=github" alt="GitHub"/></a>
   <a href="https://et.linkedin.com/in/cipher-attack-93582433b"><img src="https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin" alt="LinkedIn"/></a>
 </div>
