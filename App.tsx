@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from './components/Sidebar';
 import ControlPanel from './components/ControlPanel';
@@ -363,7 +362,8 @@ const App: React.FC = () => {
   const isDark = theme === 'dark';
 
   return (
-    <div className={`flex h-screen w-screen font-sans overflow-hidden relative ${isDark ? 'mesh-bg-dark text-gray-100' : 'mesh-bg-light text-gray-900'}`}>
+    // Changed h-screen to h-[100dvh] for mobile browser address bar compatibility
+    <div className={`flex h-[100dvh] w-screen font-sans overflow-hidden relative ${isDark ? 'mesh-bg-dark text-gray-100' : 'mesh-bg-light text-gray-900'}`}>
       
       {/* 1. SIDEBAR */}
       {!isZenMode && (
@@ -384,14 +384,14 @@ const App: React.FC = () => {
       )}
 
       {/* 2. MAIN AREA */}
-      <main className="flex-1 flex flex-col min-w-0 relative z-10 transition-all duration-300">
+      <main className="flex-1 flex flex-col min-w-0 min-h-0 relative z-10 transition-all duration-300">
         
         {/* Header - Glassmorphism */}
         {currentView !== 'about' && (
-        <header className={`h-16 flex items-center justify-between px-4 flex-shrink-0 z-20 glass-panel ${isDark ? 'glass-dark' : 'glass-light'} mx-4 mt-3 rounded-2xl`}>
-          <div className="flex items-center gap-3">
+        <header className={`h-16 flex-shrink-0 flex items-center justify-between px-3 md:px-4 z-20 glass-panel ${isDark ? 'glass-dark' : 'glass-light'} mx-2 md:mx-4 mt-2 md:mt-3 rounded-xl md:rounded-2xl`}>
+          <div className="flex items-center gap-2 md:gap-3">
              <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`p-2 rounded-xl transition-all ${isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-black/5'}`}>
-                <LayoutTemplate size={20} />
+                <LayoutTemplate size={18} className="md:w-5 md:h-5" />
              </button>
              
              {/* Persona/Title Switcher based on View */}
@@ -417,7 +417,7 @@ const App: React.FC = () => {
              )}
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 md:gap-2">
              {currentView === 'chat' && (
                 <button onClick={() => setConfig(prev => ({...prev}))} className={`hidden md:flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-mono font-medium ${isDark ? 'bg-white/10 text-gray-300' : 'bg-black/5 text-gray-600'}`}>
                     Est. Cost: ${((tokenCount * 0.0001) + (history.length * 0.00005)).toFixed(5)}
@@ -425,22 +425,22 @@ const App: React.FC = () => {
              )}
              
              {currentView === 'chat' && (
-                 <button onClick={exportChat} className={`p-2.5 rounded-xl transition-colors ${isDark ? 'text-gray-300 hover:bg-white/10 hover:text-white' : 'text-gray-600 hover:bg-black/5 hover:text-black'}`} title="Export Chat">
-                    <Download size={20} />
+                 <button onClick={exportChat} className={`p-2 md:p-2.5 rounded-xl transition-colors ${isDark ? 'text-gray-300 hover:bg-white/10 hover:text-white' : 'text-gray-600 hover:bg-black/5 hover:text-black'}`} title="Export Chat">
+                    <Download size={18} className="md:w-5 md:h-5" />
                  </button>
              )}
 
-             <button onClick={() => setIsWideMode(!isWideMode)} className={`p-2.5 rounded-xl transition-colors ${isWideMode ? 'text-blue-500' : (isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-black/5')}`} title="Wide Mode">
+             <button onClick={() => setIsWideMode(!isWideMode)} className={`hidden md:block p-2.5 rounded-xl transition-colors ${isWideMode ? 'text-blue-500' : (isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-black/5')}`} title="Wide Mode">
                 {isWideMode ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
              </button>
 
-             <button onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')} className={`p-2.5 rounded-xl transition-colors ${isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-black/5'}`}>
-                {isDark ? <Sun size={20} /> : <Moon size={20} />}
+             <button onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')} className={`p-2 md:p-2.5 rounded-xl transition-colors ${isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-black/5'}`}>
+                {isDark ? <Sun size={18} className="md:w-5 md:h-5" /> : <Moon size={18} className="md:w-5 md:h-5" />}
              </button>
              
              {!isZenMode && (
-                <button onClick={() => setIsControlsOpen(!isControlsOpen)} className={`p-2.5 rounded-xl transition-colors ${isControlsOpen ? 'bg-blue-500/20 text-blue-400' : (isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-black/5')}`}>
-                    <Box size={20} />
+                <button onClick={() => setIsControlsOpen(!isControlsOpen)} className={`p-2 md:p-2.5 rounded-xl transition-colors ${isControlsOpen ? 'bg-blue-500/20 text-blue-400' : (isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-black/5')}`}>
+                    <Box size={18} className="md:w-5 md:h-5" />
                 </button>
              )}
           </div>
@@ -464,29 +464,28 @@ const App: React.FC = () => {
                 <div 
                     ref={chatContainerRef}
                     onScroll={handleScroll}
-                    className={`flex-1 overflow-y-auto p-4 custom-scrollbar scroll-smooth relative ${isWideMode ? 'max-w-[1600px] mx-auto w-full px-8' : 'max-w-4xl mx-auto w-full'}`}
+                    className={`flex-1 min-h-0 overflow-y-auto px-2 md:px-4 py-4 custom-scrollbar scroll-smooth relative ${isWideMode ? 'max-w-[1600px] mx-auto w-full px-8' : 'max-w-4xl mx-auto w-full'}`}
                 >
                 {history.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center select-none text-center">
-                        <div className="mb-8 relative group">
+                        <div className="mb-6 md:mb-8 relative group">
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-500 rounded-full"></div>
-                            <div className={`relative z-10 p-6 rounded-3xl ${isDark ? 'glass-dark' : 'glass-light'}`}>
-                                <CipherLogo className="w-20 h-20 text-blue-500" />
+                            <div className={`relative z-10 p-5 md:p-6 rounded-3xl ${isDark ? 'glass-dark' : 'glass-light'}`}>
+                                <CipherLogo className="w-16 h-16 md:w-20 md:h-20 text-blue-500" />
                             </div>
                         </div>
-                        <h1 className={`text-4xl font-bold mb-3 tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>Cipher Studio</h1>
-                        <p className="text-gray-500 mb-10 max-w-sm text-lg font-light">Advanced reasoning. Beautifully designed.</p>
+                        <h1 className={`text-3xl md:text-4xl font-bold mb-3 tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>Cipher Studio</h1>
+                        <p className="text-gray-500 mb-8 md:mb-10 max-w-sm text-base md:text-lg font-light">Advanced reasoning. Beautifully designed.</p>
                         
                         <div className="flex gap-4 text-xs font-mono text-gray-400">
                                 <span className={`px-3 py-1.5 rounded-md border ${isDark ? 'border-white/10 bg-white/5' : 'border-black/5 bg-black/5'}`}>Shift + Enter to run</span>
-                                <span className={`px-3 py-1.5 rounded-md border ${isDark ? 'border-white/10 bg-white/5' : 'border-black/5 bg-black/5'}`}>Pro Mode Active</span>
                         </div>
                     </div>
                 ) : (
-                    <div className="space-y-8 pb-32 pt-4">
+                    <div className="space-y-6 md:space-y-8 pb-32 pt-2 md:pt-4">
                         {/* Pinned Messages Area */}
                         {history.filter(m => m.pinned).length > 0 && (
-                            <div className={`mb-8 p-5 rounded-2xl border-l-4 border-blue-500 shadow-lg ${isDark ? 'bg-black/30 border-y border-r border-white/5' : 'bg-white/60 border-y border-r border-gray-200'} backdrop-blur-md`}>
+                            <div className={`mb-6 md:mb-8 p-4 md:p-5 rounded-2xl border-l-4 border-blue-500 shadow-lg ${isDark ? 'bg-black/30 border-y border-r border-white/5' : 'bg-white/60 border-y border-r border-gray-200'} backdrop-blur-md`}>
                                 <div className="flex items-center gap-2 mb-3 text-xs font-bold uppercase tracking-wider text-blue-500">
                                     <Pin size={12} fill="currentColor" /> Pinned Context
                                 </div>
@@ -503,16 +502,16 @@ const App: React.FC = () => {
                         )}
 
                         {history.map((msg, idx) => (
-                            <div key={idx} className={`flex gap-5 group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            <div key={idx} className={`flex gap-3 md:gap-5 group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                 
                                 {msg.role === 'model' && (
-                                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg ${isDark ? 'bg-gradient-to-br from-[#2a2a35] to-[#1a1a20] text-blue-400 border border-white/5' : 'bg-white text-blue-600 border border-gray-100'}`}>
-                                        <CipherLogo className="w-6 h-6" />
+                                    <div className={`w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg ${isDark ? 'bg-gradient-to-br from-[#2a2a35] to-[#1a1a20] text-blue-400 border border-white/5' : 'bg-white text-blue-600 border border-gray-100'}`}>
+                                        <CipherLogo className="w-5 h-5 md:w-6 md:h-6" />
                                     </div>
                                 )}
 
-                                <div className={`flex flex-col max-w-[85%] lg:max-w-[75%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                                    <div className={`px-6 py-5 rounded-[1.5rem] relative shadow-md backdrop-blur-sm ${
+                                <div className={`flex flex-col max-w-[90%] md:max-w-[85%] lg:max-w-[75%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                                    <div className={`px-4 md:px-6 py-3 md:py-5 rounded-[1.2rem] md:rounded-[1.5rem] relative shadow-md backdrop-blur-sm ${
                                         msg.role === 'user' 
                                         ? (isDark ? 'bg-[#27272a]/90 border border-white/10 text-white rounded-tr-sm' : 'bg-blue-600 text-white shadow-blue-500/20 rounded-tr-sm')
                                         : (isDark ? 'glass-dark rounded-tl-sm' : 'glass-light rounded-tl-sm')
@@ -524,7 +523,7 @@ const App: React.FC = () => {
                                                     <img 
                                                         key={i} 
                                                         src={`data:${att.mimeType};base64,${att.data}`} 
-                                                        className="h-40 rounded-xl border border-white/10 object-cover cursor-pointer hover:scale-105 transition-transform shadow-lg" 
+                                                        className="h-32 md:h-40 rounded-xl border border-white/10 object-cover cursor-pointer hover:scale-105 transition-transform shadow-lg" 
                                                         onClick={() => setLightboxImage(`data:${att.mimeType};base64,${att.data}`)}
                                                     />
                                                 ))}
@@ -532,7 +531,7 @@ const App: React.FC = () => {
                                         )}
                                         
                                         {msg.role === 'user' ? (
-                                            <div className="whitespace-pre-wrap text-[0.95rem] leading-7 font-light">{msg.text}</div>
+                                            <div className="whitespace-pre-wrap text-[0.9rem] md:text-[0.95rem] leading-6 md:leading-7 font-light">{msg.text}</div>
                                         ) : (
                                             <>
                                                 <MarkdownRenderer content={msg.text} theme={theme} />
@@ -567,28 +566,27 @@ const App: React.FC = () => {
 
                                     {/* Action Bar */}
                                     {msg.role === 'model' && !isStreaming && (
-                                        <div className="mt-2 ml-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                                        <div className="mt-2 ml-2 flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 md:translate-y-2 md:group-hover:translate-y-0">
                                             <button onClick={() => speakText(msg.text)} className="p-1.5 text-gray-500 hover:text-blue-500 rounded-lg hover:bg-white/5"><Volume2 size={14} /></button>
                                             <button onClick={() => navigator.clipboard.writeText(msg.text)} className="p-1.5 text-gray-500 hover:text-blue-500 rounded-lg hover:bg-white/5"><Copy size={14} /></button>
                                             <button onClick={() => togglePin(idx)} className={`p-1.5 rounded-lg hover:bg-white/5 ${msg.pinned ? 'text-blue-500' : 'text-gray-500 hover:text-blue-500'}`}><Pin size={14} fill={msg.pinned ? "currentColor" : "none"}/></button>
                                             <div className="h-3 w-[1px] bg-gray-600/30 mx-1"></div>
                                             <button onClick={() => handleTextAction('shorter', msg.text)} className="text-[10px] px-2 py-1 rounded-md bg-white/5 text-gray-500 hover:bg-white/10 hover:text-gray-300 border border-transparent hover:border-white/5">Shorten</button>
-                                            <button onClick={() => handleTextAction('eli5', msg.text)} className="text-[10px] px-2 py-1 rounded-md bg-white/5 text-gray-500 hover:bg-white/10 hover:text-gray-300 border border-transparent hover:border-white/5">Explain</button>
                                         </div>
                                     )}
                                 </div>
 
                                 {msg.role === 'user' && (
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${isDark ? 'bg-gray-800 text-gray-300 border border-white/5' : 'bg-gray-200 text-gray-600'}`}>
-                                        <UserCircle size={24} />
+                                    <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${isDark ? 'bg-gray-800 text-gray-300 border border-white/5' : 'bg-gray-200 text-gray-600'}`}>
+                                        <UserCircle size={20} className="md:w-6 md:h-6" />
                                     </div>
                                 )}
                             </div>
                         ))}
 
                         {isStreaming && (
-                            <div className="flex gap-5">
-                                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 animate-pulse ${isDark ? 'bg-[#1e1e1e] text-blue-400' : 'bg-white text-blue-600'}`}>
+                            <div className="flex gap-3 md:gap-5">
+                                <div className={`w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0 animate-pulse ${isDark ? 'bg-[#1e1e1e] text-blue-400' : 'bg-white text-blue-600'}`}>
                                     <Zap size={20} fill="currentColor" />
                                 </div>
                                 <div className="flex items-center gap-3 h-10">
@@ -610,40 +608,40 @@ const App: React.FC = () => {
                 {showScrollButton && (
                     <button 
                         onClick={scrollToBottom}
-                        className="absolute bottom-32 left-1/2 -translate-x-1/2 bg-blue-600 text-white p-3 rounded-full shadow-2xl z-20 hover:scale-110 transition-transform border-4 border-white/10 backdrop-blur-sm"
+                        className="absolute bottom-28 md:bottom-32 left-1/2 -translate-x-1/2 bg-blue-600 text-white p-2 md:p-3 rounded-full shadow-2xl z-20 hover:scale-110 transition-transform border-4 border-white/10 backdrop-blur-sm"
                     >
-                        <ArrowDownCircle size={24} />
+                        <ArrowDownCircle size={20} className="md:w-6 md:h-6" />
                     </button>
                 )}
 
                 {/* 3. INPUT AREA - FLOATING 3D CAPSULE */}
-                <div className="flex-shrink-0 px-4 pb-6 pt-2 relative z-30">
+                <div className="flex-shrink-0 px-2 md:px-4 pb-4 md:pb-6 pt-2 relative z-30">
                     <div className={`
                         ${isWideMode ? 'max-w-5xl' : 'max-w-3xl'} mx-auto 
-                        rounded-[2rem] p-2 relative transition-all
+                        rounded-[1.5rem] md:rounded-[2rem] p-1.5 md:p-2 relative transition-all
                         ${isDark ? 'glass-3d-input-dark' : 'glass-3d-input-light'}
                     `}>
                         {attachments.length > 0 && (
                             <div className="flex gap-3 px-4 pt-3 pb-2 overflow-x-auto">
                                 {attachments.map((att, idx) => (
                                     <div key={idx} className="relative group flex-shrink-0">
-                                        <img src={`data:${att.mimeType};base64,${att.data}`} className="h-16 w-16 object-cover rounded-xl border border-white/10 shadow-md" />
+                                        <img src={`data:${att.mimeType};base64,${att.data}`} className="h-14 w-14 md:h-16 md:w-16 object-cover rounded-xl border border-white/10 shadow-md" />
                                         <button 
                                             onClick={() => setAttachments(prev => prev.filter((_, i) => i !== idx))}
                                             className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 transition-colors"
                                         >
-                                            <X size={12} />
+                                            <X size={10} />
                                         </button>
                                     </div>
                                 ))}
                             </div>
                         )}
 
-                        <div className="flex items-end gap-3 px-3 pb-1">
+                        <div className="flex items-end gap-2 md:gap-3 px-2 md:px-3 pb-1">
                             <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileUpload} />
                             
-                            <button onClick={() => fileInputRef.current?.click()} className={`p-3 rounded-2xl mb-1 transition-all duration-200 ${isDark ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-500 hover:text-blue-600 hover:bg-blue-50'}`}>
-                                <ImageIcon size={22} />
+                            <button onClick={() => fileInputRef.current?.click()} className={`p-2 md:p-3 rounded-2xl mb-1 transition-all duration-200 ${isDark ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-500 hover:text-blue-600 hover:bg-blue-50'}`}>
+                                <ImageIcon size={20} className="md:w-[22px] md:h-[22px]" />
                             </button>
                             
                             <textarea
@@ -652,41 +650,41 @@ const App: React.FC = () => {
                                 onChange={(e) => setPrompt(e.target.value)}
                                 onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleRun(); } }}
                                 placeholder={isRecording ? "Listening..." : "Ask anything..."}
-                                className={`w-full bg-transparent py-4 max-h-[200px] min-h-[56px] outline-none resize-none text-[1rem] leading-relaxed placeholder-gray-500/80 ${isDark ? 'text-gray-100' : 'text-gray-800'}`}
+                                className={`w-full bg-transparent py-3 md:py-4 max-h-[150px] md:max-h-[200px] min-h-[50px] md:min-h-[56px] outline-none resize-none text-[0.95rem] md:text-[1rem] leading-relaxed placeholder-gray-500/80 ${isDark ? 'text-gray-100' : 'text-gray-800'}`}
                                 rows={1}
                             />
 
-                            <div className="flex items-center gap-2 mb-1">
-                                <button onClick={toggleRecording} className={`p-3 rounded-2xl transition-all ${isRecording ? 'text-red-500 bg-red-500/10' : (isDark ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-500 hover:text-blue-600 hover:bg-blue-50')}`}>
+                            <div className="flex items-center gap-1 md:gap-2 mb-1">
+                                <button onClick={toggleRecording} className={`p-2 md:p-3 rounded-2xl transition-all ${isRecording ? 'text-red-500 bg-red-500/10' : (isDark ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-500 hover:text-blue-600 hover:bg-blue-50')}`}>
                                     <AudioVisualizer isActive={isRecording} />
                                 </button>
                                 
                                 {isStreaming ? (
-                                    <button className="p-3 bg-red-500 text-white rounded-2xl hover:bg-red-600 shadow-lg shadow-red-500/20" onClick={() => window.location.reload()}>
-                                        <StopCircle size={22} />
+                                    <button className="p-2 md:p-3 bg-red-500 text-white rounded-2xl hover:bg-red-600 shadow-lg shadow-red-500/20" onClick={() => window.location.reload()}>
+                                        <StopCircle size={20} className="md:w-[22px] md:h-[22px]" />
                                     </button>
                                 ) : (
                                     <button 
                                         onClick={() => handleRun()}
                                         disabled={!prompt.trim() && attachments.length === 0}
-                                        className={`p-3 rounded-2xl transition-all shadow-lg ${
+                                        className={`p-2 md:p-3 rounded-2xl transition-all shadow-lg ${
                                             prompt.trim() || attachments.length > 0 
                                             ? 'bg-gradient-to-tr from-blue-600 to-blue-500 text-white shadow-blue-500/30 hover:shadow-blue-500/40 hover:scale-105 active:scale-95'
                                             : (isDark ? 'bg-white/5 text-gray-600 cursor-not-allowed' : 'bg-gray-200 text-gray-400 cursor-not-allowed')
                                         }`}
                                     >
-                                        <Send size={22} fill="currentColor" />
+                                        <Send size={20} className="md:w-[22px] md:h-[22px]" fill="currentColor" />
                                     </button>
                                 )}
                             </div>
                         </div>
                     </div>
                     
-                    <div className="max-w-3xl mx-auto flex justify-between items-center mt-4 px-4 opacity-70 hover:opacity-100 transition-opacity">
+                    <div className="max-w-3xl mx-auto flex justify-between items-center mt-2 md:mt-4 px-2 md:px-4 opacity-70 hover:opacity-100 transition-opacity">
                         <div className="flex items-center gap-4 text-xs font-mono text-gray-500">
-                            <span className="flex items-center gap-1.5 cursor-help" title="Estimated tokens"><Calculator size={12}/> {Math.ceil(tokenCount)} tokens</span>
+                            <span className="hidden md:flex items-center gap-1.5 cursor-help" title="Estimated tokens"><Calculator size={12}/> {Math.ceil(tokenCount)} tokens</span>
                             <button onClick={() => setSelectedVoice(prev => prev === 'male' ? 'female' : prev === 'female' ? 'robot' : 'male')} className="flex items-center gap-1.5 hover:text-blue-400 transition-colors uppercase font-bold tracking-wide text-[10px]">
-                                Voice: {selectedVoice}
+                                {selectedVoice}
                             </button>
                         </div>
                         <div className="text-[10px] font-bold tracking-widest uppercase text-gray-400 dark:text-gray-600">
@@ -704,10 +702,10 @@ const App: React.FC = () => {
 
         {/* Lightbox */}
         {lightboxImage && (
-            <div className="fixed inset-0 z-[60] bg-black/90 backdrop-blur-xl flex items-center justify-center p-8 animate-in fade-in duration-300" onClick={() => setLightboxImage(null)}>
+            <div className="fixed inset-0 z-[60] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300" onClick={() => setLightboxImage(null)}>
                 <img src={lightboxImage} className="max-w-full max-h-full rounded-lg shadow-2xl border border-white/10" />
-                <button className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors bg-white/10 p-2 rounded-full hover:bg-white/20">
-                    <X size={32} />
+                <button className="absolute top-4 right-4 md:top-8 md:right-8 text-white/50 hover:text-white transition-colors bg-white/10 p-2 rounded-full hover:bg-white/20">
+                    <X size={24} className="md:w-8 md:h-8" />
                 </button>
             </div>
         )}
