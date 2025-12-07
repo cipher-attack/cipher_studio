@@ -61,7 +61,11 @@
     <style>
       body {
         @apply transition-colors duration-300;
+        /* Critical for Mobile: Prevents the whole page from bouncing/scrolling */
         overflow: hidden; 
+        height: 100dvh;
+        width: 100vw;
+        position: fixed;
       }
 
       /* 3D Mesh Gradient Background */
@@ -190,4 +194,4 @@
     <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>
-</html>
+  </html>
