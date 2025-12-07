@@ -58,7 +58,7 @@ This app is **Production Ready**. It includes a polyfill for the `process` varia
 
 1.  **Clone the repo**
     ```bash
-    git clone https://github.com/cipher-attack/cipher-studio.git
+    git clone https://github.com/cipher-attack/cipher_studio.git
     cd cipher-studio
     ```
 
