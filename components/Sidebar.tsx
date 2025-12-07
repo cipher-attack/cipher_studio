@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Session, Theme, ViewMode } from '../types';
 import { Plus, MessageSquare, Menu, Trash2, X, Key, Code, Sparkles, Eye, LayoutGrid, BarChart2, FileText, Shield, User } from 'lucide-react';
@@ -74,17 +73,18 @@ const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       <div className={`
-        fixed md:relative top-0 left-0 h-[calc(100vh-24px)] z-40 my-3 ml-3 rounded-2xl
-        ${isOpen ? 'w-[280px]' : 'w-0 md:w-[70px]'} 
+        fixed md:relative top-0 left-0 h-[100dvh] md:h-[calc(100vh-24px)] z-40 md:my-3 md:ml-3 rounded-r-2xl md:rounded-2xl
+        ${isOpen ? 'w-[85vw] md:w-[280px]' : 'w-0 md:w-[70px]'} 
         transition-all duration-300 ease-in-out
         flex flex-col flex-shrink-0
         glass-panel ${isDark ? 'glass-dark' : 'glass-light'}
-        overflow-hidden border-r-0 shadow-2xl
+        overflow-hidden border-r shadow-2xl md:border-r-0 md:shadow-2xl
       `}>
         {/* Header */}
-        <div className="h-20 flex items-center justify-between px-4 flex-shrink-0">
+        <div className="h-16 md:h-20 flex items-center justify-between px-4 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <button onClick={toggleSidebar} className={`p-2.5 rounded-xl transition-colors ${isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-black/5'}`}>
+            <button onClick={toggleSidebar} className={`p-2 rounded-xl transition-colors ${isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-black/5'} md:hidden`}>
+               {/* Only show menu toggle inside sidebar on mobile to close it */}
               <Menu size={20} />
             </button>
             <div className={`flex items-center gap-2 ${!isOpen && 'md:hidden'}`}>
@@ -99,7 +99,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        {/* Modules Navigation - The "Hard Part" */}
+        {/* Modules Navigation */}
         <div className={`px-3 py-2 ${isOpen ? '' : 'items-center flex flex-col'}`}>
             {isOpen && <div className={`text-[10px] font-bold uppercase tracking-widest px-3 py-2 opacity-60 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Modules</div>}
             
