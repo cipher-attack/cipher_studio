@@ -1,0 +1,5 @@
+{
+  "name": "Gemini Studio Clone",
+  "description": "A professional-grade React web application replicating Google AI Studio's interface, featuring code editing, real-time streaming response, and advanced model configuration using the Gemini API.",
+  "requestFramePermissions": []
+}

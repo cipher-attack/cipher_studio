@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Cipher Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+      // POLYFILL FOR HOSTING COMPATIBILITY (Vercel, Netlify, etc.)
+      // This prevents "process is not defined" errors in browser environments
+      window.process = {
+        env: {
+          NODE_ENV: 'production',
+          API_KEY: '' // Will be populated if env vars are injected at build time
+        }
+      };
+
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              gray: {
+                50: '#f9fafb',
+                100: '#f3f4f6', 
+                200: '#e5e7eb', 
+                300: '#d1d5db',
+                400: '#9ca3af', 
+                500: '#6b7280',
+                600: '#4b5563', 
+                700: '#374151', 
+                800: '#1f2937', 
+                900: '#111827', 
+                950: '#030712',
+              },
+            },
+            animation: {
+              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'float': 'float 6s ease-in-out infinite',
+              'aurora': 'aurora 20s linear infinite',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-10px)' },
+              },
+              aurora: {
+                '0%': { backgroundPosition: '0% 50%' },
+                '100%': { backgroundPosition: '100% 50%' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        @apply transition-colors duration-300;
+        overflow: hidden; 
+      }
+
+      /* 3D Mesh Gradient Background */
+      .mesh-bg-light {
+        background-color: #f3f4f6;
+        background-image: 
+          radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+          radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+          radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+        background-image: 
+            radial-gradient(at 40% 20%, rgba(29, 78, 216, 0.1) 0px, transparent 50%),
+            radial-gradient(at 80% 0%, rgba(236, 72, 153, 0.1) 0px, transparent 50%),
+            radial-gradient(at 0% 50%, rgba(59, 130, 246, 0.1) 0px, transparent 50%);
+        background-size: 200% 200%;
+        animation: aurora 15s ease infinite alternate;
+      }
+
+      .mesh-bg-dark {
+        background-color: #050505;
+        background-image: 
+            radial-gradient(circle at 50% 0%, rgba(50, 50, 80, 0.2), transparent 40%),
+            radial-gradient(circle at 0% 50%, rgba(30, 30, 60, 0.1), transparent 40%),
+            radial-gradient(circle at 100% 80%, rgba(60, 20, 40, 0.1), transparent 40%);
+        background-size: 150% 150%;
+        animation: aurora 20s ease infinite alternate;
+      }
+
+      /* 3D Glassmorphism Classes */
+      .glass-panel {
+        @apply backdrop-blur-2xl transition-all duration-300;
+      }
+
+      /* Light Mode Glass: Frosted, slight shadow, looks like etched glass */
+      .glass-light {
+        background: rgba(255, 255, 255, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 
+          0 4px 6px -1px rgba(0, 0, 0, 0.05),
+          0 2px 4px -1px rgba(0, 0, 0, 0.03),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      }
+
+      /* Dark Mode Glass: Deep, glossy, OLED-like reflection */
+      .glass-dark {
+        background: rgba(20, 20, 23, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 
+          0 10px 30px -10px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      }
+
+      /* Floating 3D Input Capsule */
+      .glass-3d-input-light {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 
+          0 20px 40px -10px rgba(0,0,0,0.1),
+          0 0 15px rgba(255,255,255,0.5) inset;
+      }
+
+      .glass-3d-input-dark {
+        background: rgba(30, 30, 35, 0.7);
+        backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 
+          0 20px 50px -10px rgba(0,0,0,0.7),
+          0 0 20px rgba(0,0,0,0.2) inset,
+          inset 0 1px 1px rgba(255,255,255,0.15);
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(156, 163, 175, 0.3);
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(156, 163, 175, 0.5);
+      }
+      
+      .no-scrollbar::-webkit-scrollbar {
+          display: none;
+      }
+      .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+      }
+
+      input[type=range] {
+        -webkit-appearance: none; 
+        background: transparent; 
+      }
+      input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+      }
+
+      .visualizer-bar {
+        transition: height 0.1s ease;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
+    "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0",
+    "react-syntax-highlighter": "https://esm.sh/react-syntax-highlighter@15.5.0?external=react",
+    "react-syntax-highlighter/dist/esm/styles/prism": "https://esm.sh/react-syntax-highlighter@15.5.0/dist/esm/styles/prism?external=react",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.31.0",
+    "react-syntax-highlighter/": "https://aistudiocdn.com/react-syntax-highlighter@^16.1.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
