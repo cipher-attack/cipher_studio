@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Sidebar from './components/Sidebar';
 import ControlPanel from './components/ControlPanel';
 import MarkdownRenderer from './components/MarkdownRenderer';
@@ -9,6 +9,7 @@ import DataAnalyst from './components/DataAnalyst';
 import DocIntel from './components/DocIntel';
 import CyberHouse from './components/CyberHouse';
 import About from './components/About';
+import ChatMessageItem from './components/ChatMessageItem'; // NEW IMPORT
 import { streamContent } from './services/geminiService';
 import { ModelConfig, Session, DEFAULT_CONFIG, ChatMessage, Attachment, Persona, Theme, Voice, ViewMode, GroundingMetadata } from './types';
 import { 
@@ -129,9 +130,14 @@ const App: React.FC = () => {
     if (savedKey) setApiKey(savedKey);
   }, []);
 
-  // Save Sessions
+  // Save Sessions with Debounce (Fix for "Lag after finishing")
   useEffect(() => {
-    if (sessions.length > 0) localStorage.setItem('gemini_sessions_v5', JSON.stringify(sessions));
+    if (sessions.length > 0) {
+        const handler = setTimeout(() => {
+            localStorage.setItem('gemini_sessions_v5', JSON.stringify(sessions));
+        }, 1000); // Wait 1 second after update before performing heavy write
+        return () => clearTimeout(handler);
+    }
   }, [sessions]);
 
   // Save API Key
@@ -249,11 +255,16 @@ const App: React.FC = () => {
 
       setHistory(prev => [...prev, { role: 'model', text: '', timestamp: Date.now() }]);
 
+      // CONTEXT WINDOWING FIX:
+      // Only send the last 30 messages to the API.
+      // This prevents the "500 Error" caused by too many tokens.
+      const contextHistory = tempHistory.slice(0, -1).slice(-30);
+
       await streamContent(
           apiKey, 
           userMsg.text, 
           userMsg.attachments || [], 
-          tempHistory.slice(0, -1), 
+          contextHistory, // Sending optimized history 
           config, 
           (chunk) => {
             fullResponse = chunk;
@@ -289,7 +300,8 @@ const App: React.FC = () => {
   };
 
   // Feature: Text Actions
-  const handleTextAction = (action: string, text: string) => {
+  // Use useCallback to help with memoization, though strictly not required with custom equality check
+  const handleTextAction = useCallback((action: string, text: string) => {
       let prompt = "";
       switch(action) {
           case 'eli5': prompt = `Explain this like I'm 5: "${text.slice(0, 500)}..."`; break;
@@ -299,7 +311,7 @@ const App: React.FC = () => {
           case 'code': prompt = `Convert to code: "${text.slice(0, 1000)}..."`; break;
       }
       if(prompt) handleRun(prompt);
-  };
+  }, [handleRun]);
 
   // Feature: Export Chat
   const exportChat = () => {
@@ -314,16 +326,16 @@ const App: React.FC = () => {
   };
 
   // Feature: Pin Message
-  const togglePin = (index: number) => {
+  const togglePin = useCallback((index: number) => {
       setHistory(prev => {
           const newHist = [...prev];
           newHist[index] = { ...newHist[index], pinned: !newHist[index].pinned };
           return newHist;
       });
-  };
+  }, []);
 
   // Feature: TTS Voice Selection
-  const speakText = (text: string) => {
+  const speakText = useCallback((text: string) => {
       const u = new SpeechSynthesisUtterance(text);
       const voices = window.speechSynthesis.getVoices();
       // Heuristic for selecting voice
@@ -331,7 +343,7 @@ const App: React.FC = () => {
       else if (selectedVoice === 'female') u.voice = voices.find(v => v.name.includes('Female') || v.name.includes('Zira')) || voices[0];
       else u.rate = 0.8; // Robot-like
       window.speechSynthesis.speak(u);
-  };
+  }, [selectedVoice]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files[0]) {
@@ -388,7 +400,7 @@ const App: React.FC = () => {
         
         {/* Header - Glassmorphism */}
         {currentView !== 'about' && (
-        <header className={`h-16 flex-shrink-0 flex items-center justify-between px-3 md:px-4 z-20 glass-panel ${isDark ? 'glass-dark' : 'glass-light'} mx-2 md:mx-4 mt-2 md:mt-3 rounded-xl md:rounded-2xl`}>
+        <header className={`h-14 md:h-16 flex-shrink-0 flex items-center justify-between px-3 md:px-4 z-20 glass-panel ${isDark ? 'glass-dark' : 'glass-light'} mx-2 md:mx-4 mt-2 md:mt-3 rounded-xl md:rounded-2xl`}>
           <div className="flex items-center gap-2 md:gap-3">
              <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`p-2 rounded-xl transition-all ${isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-black/5'}`}>
                 <LayoutTemplate size={18} className="md:w-5 md:h-5" />
@@ -470,8 +482,10 @@ const App: React.FC = () => {
                     <div className="h-full flex flex-col items-center justify-center select-none text-center">
                         <div className="mb-6 md:mb-8 relative group">
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-500 rounded-full"></div>
-                            <div className={`relative z-10 p-5 md:p-6 rounded-3xl ${isDark ? 'glass-dark' : 'glass-light'}`}>
-                                <CipherLogo className="w-16 h-16 md:w-20 md:h-20 text-blue-500" />
+                            
+                            {/* CHANGED: Removed glass-panel container background, kept glowing effect */}
+                            <div className={`relative z-10 p-2`}>
+                                <CipherLogo className="w-24 h-24 md:w-32 md:h-32 text-blue-500 filter drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
                             </div>
                         </div>
                         <h1 className={`text-3xl md:text-4xl font-bold mb-3 tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>Cipher Studio</h1>
@@ -501,87 +515,20 @@ const App: React.FC = () => {
                             </div>
                         )}
 
+                        {/* RENDER OPTIMIZED LIST */}
                         {history.map((msg, idx) => (
-                            <div key={idx} className={`flex gap-3 md:gap-5 group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                
-                                {msg.role === 'model' && (
-                                    <div className={`w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg ${isDark ? 'bg-gradient-to-br from-[#2a2a35] to-[#1a1a20] text-blue-400 border border-white/5' : 'bg-white text-blue-600 border border-gray-100'}`}>
-                                        <CipherLogo className="w-5 h-5 md:w-6 md:h-6" />
-                                    </div>
-                                )}
-
-                                <div className={`flex flex-col max-w-[90%] md:max-w-[85%] lg:max-w-[75%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                                    <div className={`px-4 md:px-6 py-3 md:py-5 rounded-[1.2rem] md:rounded-[1.5rem] relative shadow-md backdrop-blur-sm ${
-                                        msg.role === 'user' 
-                                        ? (isDark ? 'bg-[#27272a]/90 border border-white/10 text-white rounded-tr-sm' : 'bg-blue-600 text-white shadow-blue-500/20 rounded-tr-sm')
-                                        : (isDark ? 'glass-dark rounded-tl-sm' : 'glass-light rounded-tl-sm')
-                                    }`}>
-                                        {/* Attachments */}
-                                        {msg.attachments && msg.attachments.length > 0 && (
-                                            <div className="flex gap-3 mb-4 flex-wrap">
-                                                {msg.attachments.map((att, i) => (
-                                                    <img 
-                                                        key={i} 
-                                                        src={`data:${att.mimeType};base64,${att.data}`} 
-                                                        className="h-32 md:h-40 rounded-xl border border-white/10 object-cover cursor-pointer hover:scale-105 transition-transform shadow-lg" 
-                                                        onClick={() => setLightboxImage(`data:${att.mimeType};base64,${att.data}`)}
-                                                    />
-                                                ))}
-                                            </div>
-                                        )}
-                                        
-                                        {msg.role === 'user' ? (
-                                            <div className="whitespace-pre-wrap text-[0.9rem] md:text-[0.95rem] leading-6 md:leading-7 font-light">{msg.text}</div>
-                                        ) : (
-                                            <>
-                                                <MarkdownRenderer content={msg.text} theme={theme} />
-                                                
-                                                {/* Grounding / Search Sources */}
-                                                {msg.groundingMetadata && msg.groundingMetadata.groundingChunks?.length > 0 && (
-                                                    <div className={`mt-4 pt-3 border-t ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
-                                                        <div className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-2 flex items-center gap-1">
-                                                            <Globe size={10} /> Sources
-                                                        </div>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {msg.groundingMetadata.groundingChunks.map((chunk, i) => (
-                                                                chunk.web && (
-                                                                    <a 
-                                                                        key={i} 
-                                                                        href={chunk.web.uri} 
-                                                                        target="_blank" 
-                                                                        rel="noopener noreferrer"
-                                                                        className={`text-xs px-2 py-1 rounded-md transition-colors truncate max-w-[200px] flex items-center gap-1.5 ${isDark ? 'bg-white/5 hover:bg-white/10 text-blue-300' : 'bg-black/5 hover:bg-black/10 text-blue-600'}`}
-                                                                    >
-                                                                        <div className="w-1.5 h-1.5 rounded-full bg-current opacity-50"></div>
-                                                                        {chunk.web.title}
-                                                                    </a>
-                                                                )
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </>
-                                        )}
-                                    </div>
-
-                                    {/* Action Bar */}
-                                    {msg.role === 'model' && !isStreaming && (
-                                        <div className="mt-2 ml-2 flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 md:translate-y-2 md:group-hover:translate-y-0">
-                                            <button onClick={() => speakText(msg.text)} className="p-1.5 text-gray-500 hover:text-blue-500 rounded-lg hover:bg-white/5"><Volume2 size={14} /></button>
-                                            <button onClick={() => navigator.clipboard.writeText(msg.text)} className="p-1.5 text-gray-500 hover:text-blue-500 rounded-lg hover:bg-white/5"><Copy size={14} /></button>
-                                            <button onClick={() => togglePin(idx)} className={`p-1.5 rounded-lg hover:bg-white/5 ${msg.pinned ? 'text-blue-500' : 'text-gray-500 hover:text-blue-500'}`}><Pin size={14} fill={msg.pinned ? "currentColor" : "none"}/></button>
-                                            <div className="h-3 w-[1px] bg-gray-600/30 mx-1"></div>
-                                            <button onClick={() => handleTextAction('shorter', msg.text)} className="text-[10px] px-2 py-1 rounded-md bg-white/5 text-gray-500 hover:bg-white/10 hover:text-gray-300 border border-transparent hover:border-white/5">Shorten</button>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {msg.role === 'user' && (
-                                    <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${isDark ? 'bg-gray-800 text-gray-300 border border-white/5' : 'bg-gray-200 text-gray-600'}`}>
-                                        <UserCircle size={20} className="md:w-6 md:h-6" />
-                                    </div>
-                                )}
-                            </div>
+                            <ChatMessageItem
+                                key={msg.id || idx} // Use ID if available for better React recon
+                                msg={msg}
+                                index={idx}
+                                theme={theme}
+                                isStreaming={isStreaming && idx === history.length - 1}
+                                isLast={idx === history.length - 1}
+                                onLightbox={setLightboxImage}
+                                onSpeak={speakText}
+                                onPin={togglePin}
+                                onTextAction={handleTextAction}
+                            />
                         ))}
 
                         {isStreaming && (
@@ -615,7 +562,7 @@ const App: React.FC = () => {
                 )}
 
                 {/* 3. INPUT AREA - FLOATING 3D CAPSULE */}
-                <div className="flex-shrink-0 px-2 md:px-4 pb-4 md:pb-6 pt-2 relative z-30">
+                <div className="flex-shrink-0 px-2 md:px-4 pb-2 md:pb-6 pt-2 relative z-30">
                     <div className={`
                         ${isWideMode ? 'max-w-5xl' : 'max-w-3xl'} mx-auto 
                         rounded-[1.5rem] md:rounded-[2rem] p-1.5 md:p-2 relative transition-all
