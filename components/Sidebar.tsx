@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Session, Theme, ViewMode } from '../types';
 import { Plus, MessageSquare, Menu, Trash2, X, Key, Code, Sparkles, Eye, LayoutGrid, BarChart2, FileText, Shield, User } from 'lucide-react';
 
@@ -74,7 +74,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       <div className={`
         fixed md:relative top-0 left-0 h-[100dvh] md:h-[calc(100vh-24px)] z-40 md:my-3 md:ml-3 rounded-r-2xl md:rounded-2xl
-        ${isOpen ? 'w-[85vw] md:w-[280px]' : 'w-0 md:w-[70px]'} 
+        ${isOpen ? 'w-[80vw] md:w-[280px]' : 'w-0 md:w-[70px]'} 
         transition-all duration-300 ease-in-out
         flex flex-col flex-shrink-0
         glass-panel ${isDark ? 'glass-dark' : 'glass-light'}
@@ -193,4 +193,4 @@ const Sidebar: React.FC<SidebarProps> = ({
   );
 };
 
-export default Sidebar;
+export default memo(Sidebar);
