@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus, ghcolors } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -9,6 +9,7 @@ interface MarkdownRendererProps {
   content: string;
   theme?: Theme;
   onFocusMode?: boolean;
+  isStreaming?: boolean; // NEW: Controls whether to perform heavy syntax highlighting
 }
 
 const CopyButton = ({ text }: { text: string }) => {
@@ -32,7 +33,7 @@ const CopyButton = ({ text }: { text: string }) => {
   );
 };
 
-const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, theme = 'dark', onFocusMode = false }) => {
+const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, theme = 'dark', onFocusMode = false, isStreaming = false }) => {
   const isDark = theme === 'dark';
 
   return (
@@ -52,6 +53,16 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, theme = 'd
             const match = /language-(\w+)/.exec(className || '');
             const language = match ? match[1] : null;
             const codeText = String(children).replace(/\n$/, '');
+
+            // OPTIMIZATION: If streaming, do not use heavy SyntaxHighlighter. Just render a basic code block.
+            // This prevents "lag" while typing.
+            if (isStreaming && language) {
+                return (
+                    <div className={`relative my-4 rounded-lg overflow-hidden border p-4 font-mono text-xs ${isDark ? 'border-white/10 bg-[#0d0d0d] text-gray-300' : 'border-gray-200 bg-white text-gray-800'}`}>
+                        {codeText}
+                    </div>
+                );
+            }
 
             return language ? (
               <div className={`relative my-4 rounded-lg overflow-hidden border ${isDark ? 'border-white/10 bg-[#0d0d0d]' : 'border-gray-200 bg-white'}`}>
@@ -95,4 +106,4 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, theme = 'd
   );
 };
 
-export default MarkdownRenderer;
+export default memo(MarkdownRenderer);
