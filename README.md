@@ -1,4 +1,3 @@
-
 <div align="center">
   <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBmaWxsPSJub25lIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCI+PHBhdGggZD0iTSA3NSAyNSBMIDM1IDI1IEwgMTUgNTAgTCAzNSA3NSBMIDc1IDc1IiBzdHJva2U9IiMzYjgyZjYiIHN0cm9rZS13aWR0aD0iNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiAvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNTAiIHI9IjEwIiBzdHJva2U9IiMzYjgyZjYiIHN0cm9rZS13aWR0aD0iNiIgLz48cGF0aCBkPSJNIDUwIDUwIEwgODUgNTAiIHN0cm9rZT0iIzNiODJmNiIgc3Ryb2tlLXdpZHRoPSI2IiBzdHJva2UtbGluZWNhcD0icm91bmQiIC8+PHBhdGggZD0iTSA2OCA1MCBMIDY4IDYyIiBzdHJva2U9IiMzYjgyZjYiIHN0cm9rZS13aWR0aD0iNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiAvPjxwYXRoIGQ9Ik0gNzggNTAgTCA3OCA1OCIgc3Ryb2tlPSIjM2I4MmY2IiBzdHJva2Utd2lkdGg9IjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgLz48L3N2Zz4=" alt="Cipher Logo" />
   
@@ -14,47 +13,44 @@
 
 <br />
 
-Welcome to **Cipher Studio**. I built this platform because I needed a workspace that didn't just "chat" but actually *worked* alongside me. This isn't just another AI wrapper; it's a dedicated digital workstation for developers, security researchers, and creative minds.
+I built **Cipher Studio** because I got tired of standard AI wrappers that just "chat." I needed a proper digital workstation where the AI actually helps with the heavy lifting. This platform is designed for developers and security researchers who need functional tools in one place.
 
-I designed this with a **Cyber/Hacker aesthetic** in mind—clean, dark, and functional. It leverages Google's Gemini 2.5 Flash and Pro models, but I've uncapped the potential to make it a true "Red Team" assistant.
+The UI is built with a **Cyber/Hacker aesthetic**—it’s dark, clean, and gets straight to the point. Under the hood, it uses Google’s Gemini 1.5 and 2.0 Pro models, but I’ve tweaked the system instructions to make it much more useful for Red Team operations and technical auditing.
 
-##  Features
+## Modules
 
-I've broken the app down into **6 Specialized Modules**, so you don't have to keep prompting the AI to change its behavior:
+The app is split into **6 specialized modules** so you don't have to keep re-prompting the AI for different tasks:
 
-1.  ** Cipher Chat (Core)**
-    *   The main interface. It supports pinning messages, audio input/output, and image analysis.
-    *   *Specialty:* It knows the **Real-Time Date & Time** (no more "As of my last update in 2023...").
+1.  **Cipher Chat (Core)**
+    * The main interface. Supports pinned messages, audio I/O, and image analysis.
+    * It’s context-aware and knows the current date/time, so no more outdated "knowledge cutoff" excuses.
 
-2.  ** Cyber House (Red Team Ops)**
-    *   My favorite module. It includes **Real Offline JS Tools** (Base64, Hex Dump, URL Encode) built right into the UI.
-    *   The AI persona here is set to "Unrestricted" mode for generating payloads, auditing code, and analyzing logs without constant ethical refusals (for educational/testing purposes).
+2.  **Cyber House (Red Team Ops)**
+    * This is for the security folks. It has built-in **Offline JS Tools** (Base64, Hex Dump, URL Encode) so you don't have to leave the app. 
+    * The AI persona here is tuned to help with payload generation, log analysis, and code auditing without the usual "I can't help with that" roadblocks.
 
-3.  ** Code Lab**
-    *   Generates HTML/CSS/JS artifacts and renders them **instantly** in a split-screen preview.
-    *   Great for prototyping UI components in seconds.
+3.  **Code Lab**
+    * For quick UI prototyping. It generates HTML/CSS/JS and renders a live preview instantly.
 
-4.  ** Vision Hub**
-    *   Dedicated computer vision tools.
-    *   Features: `OCR Extraction`, `Code Extraction` (from screenshots), and `Threat Detect` (analyzing images for phishing indicators).
+4.  **Vision Hub**
+    * Computer vision tools focused on data extraction. Supports `OCR`, `Code Extraction` from screenshots, and a `Threat Detect` feature to scan for phishing indicators in UI designs.
 
-5.  ** Data Analyst**
-    *   Paste raw text or CSV data, and it builds interactive **Chart.js** visualizations automatically.
+5.  **Data Analyst**
+    * Toss in raw text or CSV data, and it uses **Chart.js** to build interactive visualizations on the fly.
 
-6.  ** Prompt Studio**
-    *   A tool to refine your prompt engineering skills. It takes a basic idea and expands it into a "Mega-Prompt" using chain-of-thought reasoning.
+6.  **Prompt Studio**
+    * A tool to fix bad prompts. It takes a simple sentence and expands it into a detailed "Mega-Prompt" using chain-of-thought logic.
 
-##  Tech Stack
+## Tech Stack
 
-Built with the tools I love:
-*   **Frontend:** React (TypeScript) + Vite
-*   **Styling:** Tailwind CSS (Custom "Glassmorphism" & 3D effects)
-*   **AI Engine:** Google Gemini API (`@google/genai` SDK)
-*   **Icons:** Lucide React
+* **Frontend:** React (TypeScript) + Vite
+* **Styling:** Tailwind CSS (Glassmorphism & 3D effects)
+* **AI Engine:** Google Gemini API SDK (`@google/genai`)
+* **Icons:** Lucide React
 
-##  Deployment (Vercel / Netlify)
+## Deployment & Setup
 
-This app is **Production Ready**. It includes a polyfill for the `process` variable, so it won't crash on client-side hosting platforms.
+This is a production-ready React app. I've included a polyfill for the `process` variable to prevent crashes on Vercel or Netlify.
 
 1.  **Clone the repo**
     ```bash
@@ -68,19 +64,17 @@ This app is **Production Ready**. It includes a polyfill for the `process` varia
     ```
 
 3.  **Deploy**
-    *   Just push to Vercel or Netlify.
-    *   **Note:** You can enter your Gemini API Key directly in the app sidebar (recommended for security), OR set it as an Environment Variable `VITE_API_KEY` in your hosting dashboard.
+    * Push to Vercel/Netlify. 
+    * You can either set your `VITE_API_KEY` in the dashboard or enter it manually in the app sidebar for better security.
 
-4.  **Run locally**
-    ```bash
-    npm start
-    ```
+4.  **Running on Mobile (Termux)**
+    * If you're on Termux, make sure `nodejs` and `git` are installed. Run `npm run dev` and access the local server through your browser at `localhost:3000`.
 
 ## 👤 About the Developer
 
 I'm **Biruk Getachew** (aka **Cipher Attack**).
 
-I am a Cyber Security Specialist and Web Designer based in Ethiopia. I love blending high-end aesthetics with functional security tools.
+I am a Cyber Security Specialist and Web Designer based in Ethiopia. I’m interested in the intersection of high-end aesthetics and functional security tools.
 
 ---
 *Built for the builders. Break things to fix them.*
