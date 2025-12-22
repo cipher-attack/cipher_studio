@@ -18,33 +18,33 @@ Welcome to **Cipher Studio**. I built this platform because I needed a workspace
 
 I designed this with a **Cyber/Hacker aesthetic** in mind—clean, dark, and functional. It leverages Google's Gemini 2.5 Flash and Pro models, but I've uncapped the potential to make it a true "Red Team" assistant.
 
-## 🚀 Features
+##  Features
 
 I've broken the app down into **6 Specialized Modules**, so you don't have to keep prompting the AI to change its behavior:
 
-1.  **💬 Cipher Chat (Core)**
+1.  ** Cipher Chat (Core)**
     *   The main interface. It supports pinning messages, audio input/output, and image analysis.
     *   *Specialty:* It knows the **Real-Time Date & Time** (no more "As of my last update in 2023...").
 
-2.  **🛡️ Cyber House (Red Team Ops)**
+2.  ** Cyber House (Red Team Ops)**
     *   My favorite module. It includes **Real Offline JS Tools** (Base64, Hex Dump, URL Encode) built right into the UI.
     *   The AI persona here is set to "Unrestricted" mode for generating payloads, auditing code, and analyzing logs without constant ethical refusals (for educational/testing purposes).
 
-3.  **💻 Code Lab**
+3.  ** Code Lab**
     *   Generates HTML/CSS/JS artifacts and renders them **instantly** in a split-screen preview.
     *   Great for prototyping UI components in seconds.
 
-4.  **👁️ Vision Hub**
+4.  ** Vision Hub**
     *   Dedicated computer vision tools.
     *   Features: `OCR Extraction`, `Code Extraction` (from screenshots), and `Threat Detect` (analyzing images for phishing indicators).
 
-5.  **📊 Data Analyst**
+5.  ** Data Analyst**
     *   Paste raw text or CSV data, and it builds interactive **Chart.js** visualizations automatically.
 
-6.  **✨ Prompt Studio**
+6.  ** Prompt Studio**
     *   A tool to refine your prompt engineering skills. It takes a basic idea and expands it into a "Mega-Prompt" using chain-of-thought reasoning.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 Built with the tools I love:
 *   **Frontend:** React (TypeScript) + Vite
@@ -52,7 +52,7 @@ Built with the tools I love:
 *   **AI Engine:** Google Gemini API (`@google/genai` SDK)
 *   **Icons:** Lucide React
 
-## 🌍 Deployment (Vercel / Netlify)
+##  Deployment (Vercel / Netlify)
 
 This app is **Production Ready**. It includes a polyfill for the `process` variable, so it won't crash on client-side hosting platforms.
 
