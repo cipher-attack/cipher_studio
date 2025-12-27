@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 // Firebase Imports
-import { auth } from './firebase'; 
+import { auth } from './src/firebase'; 
 import { onAuthStateChanged } from 'firebase/auth';
-import EliteAuth from './EliteAuth'; 
+import EliteAuth from './src/EliteAuth'; 
 
 // ያንተ ኦሪጅናል Imports
 import Sidebar from './components/Sidebar';
