@@ -27,8 +27,17 @@ jobs:
       - name: Build Web Assets
         run: npm run build
 
-      - name: Sync Capacitor (Using your existing folder)
+      - name: Reconstruct Android Project
         run: |
+          # የድሮውን ያልተሟላ ፎልደር ማጥፋት
+          rm -rf android
+          
+          # አዲስ አንድሮይድ ፕሮጀክት መፍጠር
+          npx cap add android
+          
+          # google-services.json ፋይልን ከየትኛውም ቦታ ፈልጎ ወደ አዲሱ ፎልደር መገልበጥ
+          find . -name "google-services.json" -exec cp {} android/app/ \;
+          
           npx cap sync android
           if [ -f "icon.svg" ]; then npx capacitor-assets generate --android; fi
 
