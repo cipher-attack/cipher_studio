@@ -17,32 +17,35 @@ jobs:
       - name: Install Dependencies
         run: |
           npm install --no-package-lock
-          npm install vite-plugin-pwa @capacitor/assets --save-dev
+          # Firebaseን ጨምሮ ሁሉንም አስፈላጊ መሳርያዎች መጫን
+          npm install vite-plugin-pwa @capacitor/assets firebase --save-dev
 
       - name: Build Web Project (Offline Enabled)
         run: npm run build
 
-      - name: Add Android Platform
+      - name: Prepare Elite Assets
         run: |
-          npm install @capacitor/cli @capacitor/core @capacitor/android
-          npx cap add android || true
-
-      - name: Force Update Elite Icons
-        run: |
-          # ሎጎውን ለተለያዩ መጠኖች ማዘጋጀት
+          # ሎጎህን ለሁሉም የሞባይል መጠኖች ማዘጋጀት
           mkdir -p assets
+          cp public/cipher.png assets/icon.png
           cp public/cipher.png assets/icon-only.png
           cp public/cipher.png assets/icon-foreground.png
           cp public/cipher.png assets/icon-background.png
           cp public/cipher.png assets/splash.png
           cp public/cipher.png assets/splash-dark.png
-          
-          # አዶዎቹን ማመንጨት
-          npx capacitor-assets generate --android --assetPath assets
 
-      - name: Sync & Fix Android
+      - name: Add & Sync Android
         run: |
-          # የ Kotlin ስሪት ማስተካከያ
+          npm install @capacitor/cli @capacitor/core @capacitor/android
+          npx cap add android || true
+          
+          # የድሮ ሎጎዎችን በሃይል ማጥፋት (Force Clean)
+          rm -rf android/app/src/main/res/mipmap-* rm -rf android/app/src/main/res/drawable-*
+          
+          # አዲሱን ሎጎ ማመንጨት (Fixed Command)
+          npx capacitor-assets generate --android --assetPath assets
+          
+          # የ Kotlin ስሪት ግጭቶችን መፍቻ
           sed -i '/dependencies {/a \    constraints {\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0")\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0")\n    }' android/app/build.gradle
           
           npx cap sync android
