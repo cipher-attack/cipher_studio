@@ -14,22 +14,39 @@ export default defineConfig(({ mode }) => {
         react(),
         VitePWA({ 
           registerType: 'autoUpdate',
-          includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+          workbox: {
+            // ሁሉንም ፋይሎች ለ Offline ስራ ስልክህ ላይ ሴቭ ያደርጋል
+            globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,woff2}'],
+            runtimeCaching: [
+              {
+                urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+                handler: 'CacheFirst',
+                options: {
+                  cacheName: 'google-fonts-cache',
+                  expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 }
+                }
+              }
+            ]
+          },
           manifest: {
             name: 'Cipher Studio',
             short_name: 'Cipher',
             description: 'Elite Developer Studio',
-            theme_color: '#ffffff',
+            theme_color: '#000000',
+            background_color: '#000000',
+            display: 'standalone',
             icons: [
               {
-                src: '/resources/cipher.png', // አንተ የፈጠርከው ፓዝ
+                src: 'cipher.png', // በ public ፎልደር ውስጥ ያለውን ሎጎ ይጠቀማል
                 sizes: '192x192',
-                type: 'image/png'
+                type: 'image/png',
+                purpose: 'any maskable'
               },
               {
-                src: '/resources/cipher.png', // አንተ የፈጠርከው ፓዝ
+                src: 'cipher.png',
                 sizes: '512x512',
-                type: 'image/png'
+                type: 'image/png',
+                purpose: 'any maskable'
               }
             ]
           }
