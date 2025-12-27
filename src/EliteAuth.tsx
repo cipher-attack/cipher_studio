@@ -77,12 +77,13 @@ export default function EliteAuth({ onLogin, isPaidUser = false }: EliteAuthProp
         
         {/* Elite SVG Logo */}
         <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
-          <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 0 15px rgba(59, 130, 246, 0.6))' }}>
-            <circle cx="50" cy="50" r="45" stroke="#3b82f6" strokeWidth="2" strokeDasharray="10 5" />
-            <path d="M30 50L45 65L70 35" stroke="white" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-            <rect x="20" y="20" width="60" height="60" rx="15" stroke="#3b82f6" strokeWidth="4" />
-            <path d="M50 10V20M50 80V90M10 50H20M80 50H90" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" />
-          </svg>
+          <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M 75 25 L 35 25 L 15 50 L 35 75 L 75 75" stroke="#10b981" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="40" cy="50" r="10" stroke="#10b981" stroke-width="6"/>
+  <path d="M 50 50 L 85 50" stroke="#10b981" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 68 50 L 68 62" stroke="#10b981" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 78 50 L 78 58" stroke="#10b981" stroke-width="6" stroke-linecap="round"/>
+</svg>
         </div>
 
         <h1 style={{ 
