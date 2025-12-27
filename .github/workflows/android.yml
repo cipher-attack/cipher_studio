@@ -17,37 +17,34 @@ jobs:
       - name: Install Dependencies
         run: |
           npm install --no-package-lock
-          # Firebaseን ጨምሮ ሁሉንም አስፈላጊ መሳርያዎች መጫን
           npm install vite-plugin-pwa @capacitor/assets firebase --save-dev
 
-      - name: Build Web Project (Offline Enabled)
+      - name: Build Web Project
         run: npm run build
 
-      - name: Prepare Elite Assets
+      - name: Fresh Android Setup
         run: |
-          # ሎጎህን ለሁሉም የሞባይል መጠኖች ማዘጋጀት
+          # የድሮውን ፎልደር እናጠፋለን ከአዲሱ appId ጋር እንዳይጋጭ
+          rm -rf android
+          npm install @capacitor/cli @capacitor/core @capacitor/android
+          # አዲሱን አንድሮይድ ፕሮጀክት እንፈጥራለን
+          npx cap add android
+
+      - name: Generate Elite Assets
+        run: |
           mkdir -p assets
-          cp public/cipher.png assets/icon.png
           cp public/cipher.png assets/icon-only.png
           cp public/cipher.png assets/icon-foreground.png
           cp public/cipher.png assets/icon-background.png
           cp public/cipher.png assets/splash.png
           cp public/cipher.png assets/splash-dark.png
-
-      - name: Add & Sync Android
-        run: |
-          npm install @capacitor/cli @capacitor/core @capacitor/android
-          npx cap add android || true
-          
-          # የድሮ ሎጎዎችን በሃይል ማጥፋት (Force Clean)
-          rm -rf android/app/src/main/res/mipmap-* rm -rf android/app/src/main/res/drawable-*
-          
-          # አዲሱን ሎጎ ማመንጨት (Fixed Command)
+          # ሎጎዎቹን እና ስፕላሹን ማመንጨት
           npx capacitor-assets generate --android --assetPath assets
-          
-          # የ Kotlin ስሪት ግጭቶችን መፍቻ
+
+      - name: Configure System
+        run: |
+          # የ Kotlin ስሪት ማስተካከያ
           sed -i '/dependencies {/a \    constraints {\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0")\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0")\n    }' android/app/build.gradle
-          
           npx cap sync android
 
       - name: Set up JDK 21
