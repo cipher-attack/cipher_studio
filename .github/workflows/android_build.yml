@@ -27,24 +27,20 @@ jobs:
       - name: Build Web Assets
         run: npm run build
 
-      - name: Setup Android Project
+      - name: Reconstruct Android Project
         run: |
-          # ንፁህ የአንድሮይድ ፎልደር መፍጠር
           rm -rf android
           npx cap add android
-          
-          # google-services.json ፋይልን ፈልጎ መገልበጥ
           find . -name "google-services.json" -exec cp {} android/app/ \;
-          
           npx cap sync android
-          if [ -f "icon.svg" ]; then npx capacitor-assets generate --android; fi
 
-      - name: Upgrade Gradle for Java 21 Support
+      - name: Force Upgrade Gradle (For Java 21)
         run: |
           cd android
-          # Java 21 ን እንዲረዳ Gradle ን ወደ 8.5 ከፍ ማድረግ
           chmod +x gradlew
-          ./gradlew wrapper --gradle-version 8.5
+          # Java 21 ን እንዲቀበል Gradle ን ወደ 8.5 ከፍ ማድረግ
+          ./gradlew wrapper --gradle-version 8.5 --distribution-type all
+          ./gradlew --version
 
       - name: Build APK with Gradle
         run: |
