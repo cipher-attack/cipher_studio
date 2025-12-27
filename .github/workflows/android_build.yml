@@ -14,8 +14,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Install Dependencies
-        run: npm install
+            - name: Install Dependencies
+        run: |
+          npm install
+          npm install vite-plugin-pwa -D
 
       - name: Build Web Assets
         run: npm run build
