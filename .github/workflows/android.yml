@@ -1,4 +1,4 @@
-name: Build Modern Cipher Studio APK
+name: Build Elite Cipher Studio APK
 on:
   push:
     branches: [main, master]
@@ -17,24 +17,22 @@ jobs:
       - name: Install Dependencies
         run: |
           npm install --no-package-lock
-          npm install @capacitor/assets --save-dev
+          npm install vite-plugin-pwa @capacitor/assets --save-dev
 
-      - name: Build Web Project
+      - name: Build Web Project (Offline Enabled)
         run: npm run build
 
       - name: Generate App Icons & Splash
         run: |
-          # ሎጎህን ለሁሉም የአንድሮይድ ስሪቶች ያዘጋጃል
-          if [ -f resources/cipher.png ]; then
-            npx capacitor-assets generate --android
-          fi
+          # ሎጎህን ከ public ፎልደር ወስዶ ለ Android አዶዎች ያዘጋጃል
+          npx capacitor-assets generate --android --iconSource public/cipher.png --splashSource public/cipher.png
 
       - name: Add & Sync Android
         run: |
           npm install @capacitor/cli @capacitor/core @capacitor/android
           npx cap add android || true
           
-          # የቆዩ የኮድ ግጭቶችን መፍቻ
+          # የ Kotlin ስሪት ግጭቶችን መፍቻ
           sed -i '/dependencies {/a \    constraints {\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0")\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0")\n    }' android/app/build.gradle
           
           npx cap sync android
@@ -45,15 +43,15 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Build APK
+      - name: Build Final APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
 
-      - name: Upload APK
+      - name: Upload Elite APK
         uses: actions/upload-artifact@v4
         with:
-          name: cipher-studio-apk
-          path: android/app/build/outputs/apk/debug/app-cipher.apk
+          name: cipher-studio-elite-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
 
