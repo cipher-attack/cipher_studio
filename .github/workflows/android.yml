@@ -16,15 +16,16 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          # መጀመሪያ የጠፋውን PWA መሳርያ እንጭናለን
           npm install --no-package-lock
-          npm install @capacitor/assets --save-dev
+          npm install vite-plugin-pwa @capacitor/assets --save-dev
 
       - name: Build Web Project (Offline Enabled)
         run: npm run build
 
       - name: Generate App Icons & Splash
         run: |
-          # ትክክለኛው የአዶ ማመንጫ ትዕዛዝ
+          # ሎጎህን ለማንበብ ትክክለኛው ትዕዛዝ
           npx capacitor-assets generate --android --icon-source public/cipher.png --splash-source public/cipher.png
 
       - name: Add & Sync Android
