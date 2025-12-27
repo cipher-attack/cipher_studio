@@ -1,6 +1,9 @@
 {
   "appId": "com.cipher.elite.pro",
-  "appName": "Cipher Studio Elite"
+  "appName": "Cipher Studio Elite",
   "webDir": "dist",
-  "bundledWebRuntime": false
+  "server": {
+    "androidScheme": "https"
+  }
 }
+
