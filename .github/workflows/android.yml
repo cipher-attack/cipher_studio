@@ -22,9 +22,14 @@ jobs:
       - name: Build Web Project (Offline Enabled)
         run: npm run build
 
-      - name: Generate Elite Assets
+      - name: Add Android Platform
         run: |
-          # ሎጎውን ማዘጋጀት
+          npm install @capacitor/cli @capacitor/core @capacitor/android
+          npx cap add android || true
+
+      - name: Force Update Elite Icons
+        run: |
+          # ሎጎውን ለተለያዩ መጠኖች ማዘጋጀት
           mkdir -p assets
           cp public/cipher.png assets/icon-only.png
           cp public/cipher.png assets/icon-foreground.png
@@ -32,14 +37,11 @@ jobs:
           cp public/cipher.png assets/splash.png
           cp public/cipher.png assets/splash-dark.png
           
-          # አዶዎቹን ማመንጨት (ያለ ስህተት)
+          # አዶዎቹን ማመንጨት
           npx capacitor-assets generate --android --assetPath assets
 
-      - name: Add & Sync Android
+      - name: Sync & Fix Android
         run: |
-          npm install @capacitor/cli @capacitor/core @capacitor/android
-          npx cap add android || true
-          
           # የ Kotlin ስሪት ማስተካከያ
           sed -i '/dependencies {/a \    constraints {\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0")\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0")\n    }' android/app/build.gradle
           
