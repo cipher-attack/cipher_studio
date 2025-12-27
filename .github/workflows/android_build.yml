@@ -19,12 +19,12 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install All Dependencies (Elite Mode)
+      - name: Install All Dependencies (Super Elite Mode)
         run: |
           npm install --force
-          npm install vite-plugin-pwa @capacitor/android @capacitor/assets -D
+          npm install firebase @capacitor/android @capacitor/assets vite-plugin-pwa -D
 
-      - name: Fix Config File Name (Emergency Step)
+      - name: Fix Config File Name
         run: |
           if [ -f "capacitor.config.json" ]; then mv capacitor.config.json capacitor.config.ts; fi
 
