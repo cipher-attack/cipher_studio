@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "103353734824",
+    "project_id": "cipher-studio",
+    "storage_bucket": "cipher-studio.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:103353734824:android:829aa1473b5b9a53d5949d",
+        "android_client_info": {
+          "package_name": "com.cipher.studio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "103353734824-719qpm6a3b7a12qdqak3oi3nhtgltath.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOQBQn_40m-RY_ZQ0HYWUoxVg_PIxU3e0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103353734824-08tr0qcotmd2sdtegpeavj6jjegfnnhk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
