@@ -17,32 +17,30 @@ jobs:
       - name: Install Dependencies
         run: |
           npm install --no-package-lock
-          # PWA እና Assets መሳርያዎችን መጫን
           npm install vite-plugin-pwa @capacitor/assets --save-dev
 
       - name: Build Web Project (Offline Enabled)
         run: npm run build
 
-      - name: Prepare Assets Folder
+      - name: Generate Elite Assets
         run: |
-          # ሎጎህን ለ Capacitor እንዲመች ማዘጋጀት
+          # ሎጎውን ማዘጋጀት
           mkdir -p assets
-          cp public/cipher.png assets/icon.png
+          cp public/cipher.png assets/icon-only.png
+          cp public/cipher.png assets/icon-foreground.png
+          cp public/cipher.png assets/icon-background.png
           cp public/cipher.png assets/splash.png
+          cp public/cipher.png assets/splash-dark.png
+          
+          # አዶዎቹን ማመንጨት (ያለ ስህተት)
+          npx capacitor-assets generate --android --assetPath assets
 
       - name: Add & Sync Android
         run: |
           npm install @capacitor/cli @capacitor/core @capacitor/android
           npx cap add android || true
           
-          # ሎጎው እንዲቀየር የድሮውን ፋይሎች በሃይል ማጥፋት (Force Replace)
-          rm -rf android/app/src/main/res/mipmap-*
-          rm -rf android/app/src/main/res/drawable*
-          
-          # አዲሱን ሎጎ ማመንጨት
-          npx capacitor-assets generate --android
-          
-          # የ Kotlin ስሪት ግጭቶችን መፍቻ
+          # የ Kotlin ስሪት ማስተካከያ
           sed -i '/dependencies {/a \    constraints {\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0")\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0")\n    }' android/app/build.gradle
           
           npx cap sync android
