@@ -1,69 +1,51 @@
-name: Build Elite Cipher Studio APK
+name: Deploy Static Content to Pages
+
 on:
   push:
-    branches: [main, master]
+    branches: ["main"]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
-  build:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps:deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
 
       - name: Install Dependencies
         run: |
-          npm install --no-package-lock
-          npm install vite-plugin-pwa @capacitor/assets firebase --save-dev
+          npm install
+          npm install firebase lucide-react react-markdown react-syntax-highlighter @google/genai
 
-      - name: Build Web Project (Force Clean)
-        run: |
-          # የድሮውን Build ውጤት እናጠፋለን
-          rm -rf dist
-          npm run build
+      - name: Build Project
+        run: npm run build
 
-      - name: Fresh Android Setup
-        run: |
-          # የድሮውን አንድሮይድ ፎልደር በሃይል እናጠፋለን (ከአዲሱ appId ጋር እንዲስማማ)
-          rm -rf android
-          npm install @capacitor/cli @capacitor/core @capacitor/android
-          npx cap add android
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
 
-      - name: Generate Elite Assets
-        run: |
-          mkdir -p assets
-          cp public/cipher.png assets/icon-only.png
-          cp public/cipher.png assets/icon-foreground.png
-          cp public/cipher.png assets/icon-background.png
-          cp public/cipher.png assets/splash.png
-          cp public/cipher.png assets/splash-dark.png
-          # አዲሱን ሎጎ በሃይል ማመንጨት
-          npx capacitor-assets generate --android --assetPath assets
-
-      - name: Configure System
-        run: |
-          # የ Kotlin እና የ Sync ስራዎች
-          sed -i '/dependencies {/a \    constraints {\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0")\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0")\n    }' android/app/build.gradle
-          npx cap sync android
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          path: './dist'
 
-      - name: Build Final APK
-        run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
-
-      - name: Upload Elite APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: cipher-studio-elite-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
