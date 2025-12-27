@@ -1,17 +1,43 @@
 import { auth, googleProvider } from "./firebase";
 import { signInWithPopup } from "firebase/auth";
+import { useEffect } from "react";
 
 interface EliteAuthProps {
   onLogin: () => void;
+  isPaidUser?: boolean; // ክፍያ መፈጸሙን ለማወቅ
 }
 
-export default function EliteAuth({ onLogin }: { onLogin: () => void }) {
+export default function EliteAuth({ onLogin, isPaidUser = false }: EliteAuthProps) {
+  
+  // Reload ሲያደርግ ወይም ገጹ ሲከፈት ያልከፈለ ሰው ከሆነ በድምፅ እንዲናገር
+  useEffect(() => {
+    if (auth.currentUser && !isPaidUser) {
+      const speakAlert = () => {
+        const textEn = "Access Denied. Please complete your payment to use Cipher Studio Elite.";
+        const textAm = "ፍቃድ የሎትም። እባክዎ አገልግሎቱን ለመጠቀም ክፍያዎን ያጠናቅቁ።";
+        
+        const msgEn = new SpeechSynthesisUtterance(textEn);
+        const msgAm = new SpeechSynthesisUtterance(textAm);
+        
+        msgEn.lang = 'en-US';
+        msgEn.rate = 0.9;
+        
+        window.speechSynthesis.speak(msgEn);
+        // እንግሊዝኛው ሲያልቅ አማርኛውን እንዲናገር (አማርኛ በብሮውዘር ድጋፍ መሰረት ይለያያል)
+        msgEn.onend = () => window.speechSynthesis.speak(msgAm);
+      };
+      
+      // ለተጠቃሚው ድንገት ድምፅ እንዳይረብሽ ትንሽ ቆይቶ እንዲጀምር
+      const timer = setTimeout(speakAlert, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [isPaidUser]);
+
   const handleLogin = async () => {
     try {
-      // ፖፕ አፕ እንዳይዘጋ ቀጥታ ውጤቱን እንቀበላለን
       const result = await signInWithPopup(auth, googleProvider);
       if (result.user) {
-        onLogin(); // ሎጊን ሲሳካ ወደ ዋናው ገጽ እንዲያልፍ
+        onLogin();
       }
     } catch (err) {
       console.error("Authentication Error:", err);
@@ -19,7 +45,6 @@ export default function EliteAuth({ onLogin }: { onLogin: () => void }) {
   };
 
   const handlePayment = () => {
-    // ቀጥታ ወደ ቴሌግራምህ እንዲሄድ
     window.location.href = "https://t.me/Cipher_attack";
   };
 
@@ -30,78 +55,96 @@ export default function EliteAuth({ onLogin }: { onLogin: () => void }) {
       alignItems: 'center', 
       justifyContent: 'center', 
       minHeight: '100vh', 
-      backgroundColor: '#020617', // ጥቁር ሰማያዊ (Dark Slate)
+      backgroundColor: '#020617', 
       backgroundImage: 'radial-gradient(circle at top right, #1e293b, #020617)',
       color: 'white', 
       padding: '20px',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      fontFamily: 'Inter, system-ui, sans-serif',
+      overflow: 'hidden'
     }}>
-      {/* ብርሀን የሚፈነጥቅ የጀርባ ዲዛይን (Glow Effect) */}
+      {/* ብርሀን የሚፈነጥቅ የጀርባ ዲዛይን */}
       <div style={{
         position: 'absolute',
-        width: '300px',
-        height: '300px',
+        width: '400px',
+        height: '400px',
         backgroundColor: '#3b82f6',
-        filter: 'blur(120px)',
-        opacity: '0.1',
+        filter: 'blur(150px)',
+        opacity: '0.15',
         zIndex: 0
       }}></div>
 
       <div style={{ zIndex: 1, textAlign: 'center', maxWidth: '400px' }}>
-        <img 
-          src="/cipher.png" 
-          alt="Cipher Logo" 
-          style={{ 
-            width: '80px', 
-            height: '80px',
-            marginBottom: '24px', 
-            borderRadius: '20px',
-            boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)' 
-          }} 
-        />
         
+        {/* Elite SVG Logo */}
+        <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
+          <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 0 15px rgba(59, 130, 246, 0.6))' }}>
+            <circle cx="50" cy="50" r="45" stroke="#3b82f6" strokeWidth="2" strokeDasharray="10 5" />
+            <path d="M30 50L45 65L70 35" stroke="white" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+            <rect x="20" y="20" width="60" height="60" rx="15" stroke="#3b82f6" strokeWidth="4" />
+            <path d="M50 10V20M50 80V90M10 50H20M80 50H90" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" />
+          </svg>
+        </div>
+
         <h1 style={{ 
-          fontSize: '2.5rem', 
-          fontWeight: '800', 
+          fontSize: '2.8rem', 
+          fontWeight: '900', 
           marginBottom: '12px',
-          letterSpacing: '-0.02em',
-          background: 'linear-gradient(to bottom right, #ffffff, #94a3b8)',
+          letterSpacing: '-0.03em',
+          background: 'linear-gradient(to bottom right, #ffffff, #60a5fa)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent'
         }}>
-          Cipher Studio Elite
+          Cipher Elite
         </h1>
-        
+
         <p style={{ 
           fontSize: '1.1rem', 
-          marginBottom: '40px', 
+          marginBottom: '30px', 
           lineHeight: '1.6', 
-          color: '#94a3b8' 
+          color: '#94a3b8',
+          fontWeight: '400'
         }}>
-          የላቁ የ AI መሳሪያዎችን እና ያልተገደበ አገልግሎትን ያግኙ።
+          Advanced Intelligence. <br/> 
+          <span style={{ color: '#3b82f6' }}>የላቁ የ AI መሳሪያዎችን እዚህ ያግኙ።</span>
         </p>
-        
+
+        {/* ማስጠንቀቂያ ለገቡ ግን ላልከፈሉ */}
+        {auth.currentUser && !isPaidUser && (
+          <div style={{
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid #ef4444',
+            padding: '12px',
+            borderRadius: '12px',
+            marginBottom: '20px',
+            animation: 'shake 0.5s ease-in-out'
+          }}>
+            <p style={{ color: '#fca5a5', fontSize: '14px', margin: 0 }}>
+              ⚠️ ገብተዋል ግን ክፍያዎ ገና አልተረጋገጠም። እባክዎ ለ Cipher_attack ያሳውቁ።
+            </p>
+          </div>
+        )}
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
-          {/* Google Button */}
           <button 
             onClick={handleLogin} 
             style={{ 
-              padding: '16px', 
+              padding: '18px', 
               backgroundColor: '#ffffff', 
               color: '#0f172a', 
               border: 'none', 
-              borderRadius: '14px', 
+              borderRadius: '16px', 
               fontSize: '16px', 
-              fontWeight: '600', 
+              fontWeight: '700', 
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center', 
               gap: '12px', 
               cursor: 'pointer',
-              transition: 'transform 0.2s ease'
+              boxShadow: '0 10px 25px -5px rgba(255, 255, 255, 0.1)',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
             }}
-            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+            onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
           >
             <svg width="20" height="20" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -115,47 +158,59 @@ export default function EliteAuth({ onLogin }: { onLogin: () => void }) {
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
-            gap: '10px', 
+            gap: '12px', 
             margin: '10px 0',
-            color: '#475569'
+            color: '#334155'
           }}>
             <div style={{ flex: 1, height: '1px', backgroundColor: '#1e293b' }}></div>
-            <span style={{ fontSize: '14px' }}>ወይም</span>
+            <span style={{ fontSize: '13px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px' }}>OR ACCESS</span>
             <div style={{ flex: 1, height: '1px', backgroundColor: '#1e293b' }}></div>
           </div>
 
-          {/* Telegram/Payment Button */}
           <button 
             onClick={handlePayment} 
             style={{ 
-              padding: '16px', 
+              padding: '18px', 
               backgroundColor: '#3b82f6', 
               color: 'white', 
               border: 'none', 
-              borderRadius: '14px', 
+              borderRadius: '16px', 
               fontSize: '16px', 
-              fontWeight: '600', 
+              fontWeight: '700', 
               cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 4px 15px rgba(59, 130, 246, 0.3)'
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 8px 20px rgba(59, 130, 246, 0.4)',
+              position: 'relative',
+              overflow: 'hidden'
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.backgroundColor = '#2563eb';
-              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 12px 25px rgba(59, 130, 246, 0.5)';
             }}
             onMouseOut={(e) => {
               e.currentTarget.style.backgroundColor = '#3b82f6';
-              e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
             አሁኑኑ ይግዙ — 300 ብር ብቻ
           </button>
         </div>
 
-        <p style={{ marginTop: '32px', fontSize: '13px', color: '#475569' }}>
-          የህይወት ዘመን ፍቃድ በመግዛት ሁሉንም የፕሪሚየም አገልግሎቶች ያግኙ።
-        </p>
+        <div style={{ marginTop: '40px', borderTop: '1px solid #1e293b', paddingTop: '20px' }}>
+          <p style={{ fontSize: '13px', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <span style={{ width: '6px', height: '6px', backgroundColor: '#3b82f6', borderRadius: '50%' }}></span>
+            Lifetime Access • Unlimited Prompts • Elite Support
+          </p>
+        </div>
       </div>
+      
+      {/* CSS Animation for the alert */}
+      <style>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
+        }
+      `}</style>
     </div>
   );
 }
