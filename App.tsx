@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 // Firebase Imports
 import { auth } from './src/firebase'; 
 import { onAuthStateChanged } from 'firebase/auth';
+// Firestore Imports - አዲሱ መቆለፊያ
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import EliteAuth from './src/EliteAuth'; 
 
 // ያንተ ኦሪጅናል Imports
@@ -24,6 +26,8 @@ import {
     PenTool, Terminal, ArrowDownCircle, LayoutTemplate, Sun, Moon,
     BookOpen, Languages, Scissors, FileCode, Pin, Download, UserCircle, Globe
 } from 'lucide-react';
+
+const db = getFirestore(); // Firestore-ን ማስጀመር
 
 // --- Cipher Logo Component ---
 const CipherLogo = ({ className }: { className?: string }) => (
@@ -67,8 +71,9 @@ const convertFileToBase64 = (file: File): Promise<string> => {
 };
 
 const App: React.FC = () => {
-  // --- Auth State ---
+  // --- Auth & Authorization State ---
   const [user, setUser] = useState<any>(null);
+  const [isAuthorized, setIsAuthorized] = useState(false); // ክፍያ መፈጸሙን መቆጣጠሪያ
   const [authLoading, setAuthLoading] = useState(true);
 
   // --- ያንተ ኦሪጅናል State ---
@@ -101,10 +106,27 @@ const App: React.FC = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const shouldAutoScrollRef = useRef(true);
 
-  // --- Auth Effect ---
+  // --- Auth & Firestore Authorization Effect ---
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        // ኢሜይሉን Firestore ውስጥ 'authorized_users' በሚባለው Collection ውስጥ መፈለግ
+        try {
+          const userDoc = await getDoc(doc(db, "authorized_users", currentUser.email!));
+          if (userDoc.exists() && userDoc.data().isPaid === true) {
+            setIsAuthorized(true); // የከፈለ ሰው ከሆነ ፍቃድ መስጠት
+          } else {
+            setIsAuthorized(false); // ካልከፈለ ወይም ዳታቤዝ ውስጥ ከሌለ መከልከል
+          }
+        } catch (err) {
+          console.error("Authorization check failed:", err);
+          setIsAuthorized(false);
+        }
+        setUser(currentUser);
+      } else {
+        setUser(null);
+        setIsAuthorized(false);
+      }
       setAuthLoading(false);
     });
     return () => unsubscribe();
@@ -222,7 +244,7 @@ const App: React.FC = () => {
         attachments: [...attachmentsToUse] 
     };
     const tempHistory = [...historyToUse, userMsg];
-    
+
     setHistory(tempHistory);
     setSessions(prev => prev.map(s => s.id === currentSessionId ? { ...s, history: tempHistory } : s));
 
@@ -230,7 +252,7 @@ const App: React.FC = () => {
         setPrompt('');
         setAttachments([]);
     }
-    
+
     shouldAutoScrollRef.current = true;
     setIsStreaming(true);
     setError(null);
@@ -351,12 +373,13 @@ const App: React.FC = () => {
     return (
       <div className={`h-[100dvh] w-screen flex flex-col items-center justify-center ${isDark ? 'bg-black text-white' : 'bg-gray-50 text-black'}`}>
         <CipherLogo className="w-20 h-20 animate-pulse text-blue-500 mb-4" />
-        <p className="font-mono text-sm tracking-widest uppercase opacity-50">Cipher Elite Loading...</p>
+        <p className="font-mono text-sm tracking-widest uppercase opacity-50">Cipher Elite Checking License...</p>
       </div>
     );
   }
 
-  if (!user) {
+  // ተጠቃሚው ካልገባ ወይም ካልከፈለ (Authorized ካልሆነ) የ EliteAuth ገጽን ያሳያል
+  if (!user || !isAuthorized) {
     return <EliteAuth onLogin={() => {}} />;
   }
 
@@ -396,6 +419,10 @@ const App: React.FC = () => {
              )}
           </div>
           <div className="flex items-center gap-1 md:gap-2">
+             <div className="flex items-center gap-2 mr-4 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-[10px] font-bold text-green-500 uppercase tracking-tighter">Elite Active</span>
+             </div>
              {currentView === 'chat' && (
                 <button className={`hidden md:flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-mono font-medium ${isDark ? 'bg-white/10 text-gray-300' : 'bg-black/5 text-gray-600'}`}>
                     Est. Cost: ${((tokenCount * 0.0001) + (history.length * 0.00005)).toFixed(5)}
