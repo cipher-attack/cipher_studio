@@ -1,0 +1,6 @@
+{
+  "appId": "com.cipherstudio.app",
+  "appName": "Cipher Studio",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}
