@@ -8,10 +8,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '17'
           distribution: 'temurin'
 
       - name: Set up Node.js
@@ -35,11 +35,12 @@ jobs:
           npx cap sync android
           if [ -f "icon.svg" ]; then npx capacitor-assets generate --android; fi
 
-      - name: Upgrade Gradle Wrapper
+      - name: Force Java 17 Compatibility
         run: |
-          cd android
-          # Java 21 ን እንዲቀበል Gradle ን ወደ 8.5 ከፍ ማድረግ
-          ./gradlew wrapper --gradle-version 8.5
+          # በ build.gradle ውስጥ ያሉትን የ Java 21 ጥቀሶችን ወደ 17 መቀየር
+          find android -name "build.gradle" -exec sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' {} +
+          find android -name "build.gradle" -exec sed -i 's/sourceCompatibility 21/sourceCompatibility 17/g' {} +
+          find android -name "build.gradle" -exec sed -i 's/targetCompatibility 21/targetCompatibility 17/g' {} +
 
       - name: Build APK with Gradle
         run: |
