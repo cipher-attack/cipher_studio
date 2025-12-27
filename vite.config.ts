@@ -6,6 +6,8 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
+      // ለ GitHub Pages አስፈላጊ የሆነው ማስተካከያ
+      base: '/cipher_studio/', 
       server: {
         port: 3000,
         host: '0.0.0.0',
