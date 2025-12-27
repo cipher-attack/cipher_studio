@@ -13,7 +13,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          # እዚህ ጋር የነበረውን 'cache: npm' የሚለውን አጥፍተነዋል ምክንያቱም ፋይሉ ስለሌለ ነው error የመጣው
 
       - name: Install Dependencies
         run: npm install --no-package-lock
@@ -33,10 +32,10 @@ jobs:
           npx cap add android || true
           npx cap sync android
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21 (ወሳኝ ማስተካከያ)
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
 
       - name: Build APK
