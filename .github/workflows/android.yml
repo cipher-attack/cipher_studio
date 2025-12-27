@@ -28,12 +28,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          # lock file ስለሌለ cache: 'npm' የሚለውን መስመር አጥፍተነዋል
 
       - name: Install Dependencies
         run: |
-          npm install
-          npm install firebase lucide-react react-markdown react-syntax-highlighter @google/genai
+          npm install --no-package-lock
+          npm install firebase lucide-react react-markdown react-syntax-highlighter @google/genai --no-package-lock
 
       - name: Build Project
         run: npm run build
