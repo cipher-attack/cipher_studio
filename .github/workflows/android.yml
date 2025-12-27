@@ -12,11 +12,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20 # ወደ አዲሱ ስሪት አሳድገነዋል
-          cache: 'npm'
+          node-version: 20
+          # እዚህ ጋር የነበረውን 'cache: npm' የሚለውን አጥፍተነዋል ምክንያቱም ፋይሉ ስለሌለ ነው error የመጣው
 
       - name: Install Dependencies
-        run: npm install --legacy-peer-deps
+        run: npm install --no-package-lock
 
       - name: Build Web Project
         run: npm run build
