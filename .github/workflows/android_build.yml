@@ -8,10 +8,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '17'
           distribution: 'temurin'
 
       - name: Set up Node.js
@@ -34,13 +34,13 @@ jobs:
           find . -name "google-services.json" -exec cp {} android/app/ \;
           npx cap sync android
 
-      - name: Force Upgrade Gradle (Text Edit Method)
+      - name: Force Java 17 Compatibility
+        # ይህ ክፍል "invalid source release 21" የሚለውን ስህተት ይከላከላል
         run: |
           cd android
-          # gradlew ን ከመክፈታችን በፊት የ Gradle version ን በፋይል ውስጥ ብቻ እንቀይረው
-          # ይህ ዘዴ Gradle ራሱን ሳይከፍት እንዲቀየር ያደርገዋል (Java 21 error እንዳይመጣ)
-          sed -i 's/gradle-.*-all.zip/gradle-8.5-all.zip/g' gradle/wrapper/gradle-wrapper.properties
-          sed -i 's/gradle-.*-bin.zip/gradle-8.5-all.zip/g' gradle/wrapper/gradle-wrapper.properties
+          find . -name "build.gradle" -exec sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' {} +
+          find . -name "build.gradle" -exec sed -i 's/targetCompatibility 21/targetCompatibility 17/g' {} +
+          find . -name "build.gradle" -exec sed -i 's/sourceCompatibility 21/sourceCompatibility 17/g' {} +
           chmod +x gradlew
 
       - name: Build APK with Gradle
