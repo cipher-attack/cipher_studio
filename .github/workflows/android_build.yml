@@ -37,10 +37,10 @@ jobs:
       - name: Upgrade Gradle and SDK for Java 21 Compatibility
         run: |
           cd android
-          # 1. Gradle ን ወደ 8.10 እናሳድግ (ይህ Java 21 ን ይደግፋል)
+          # 1. Gradle ን ወደ 8.10 እናሳድግ (ለ Java 21 እንዲመች)
           sed -i 's/gradle-.*-all.zip/gradle-8.10-all.zip/g' gradle/wrapper/gradle-wrapper.properties
           
-          # 2. API 35 (VANILLA_ICE_CREAM) እንዲያውቅ variables.gradle ን እናስተካክል
+          # 2. ሁሉንም አስፈላጊ ተለዋዋጮች የያዘ variables.gradle ፋይል እንፍጠር
           cat > variables.gradle <<EOF
           ext {
               minSdkVersion = 22
@@ -51,21 +51,21 @@ jobs:
               androidxCoordinatorLayoutVersion = '1.2.0'
               androidxCoreVersion = '1.13.1'
               androidxFragmentVersion = '1.8.3'
+              coreSplashScreenVersion = '1.0.1'
+              androidxResourceInspectionVersion = '1.0.1'
+              androidxWebkitVersion = '1.12.1'
               junitVersion = '4.13.2'
               androidxJunitVersion = '1.2.1'
               androidxEspressoCoreVersion = '3.6.1'
               cordovaAndroidVersion = '10.1.1'
-              javaVersion = JavaVersion.VERSION_21
           }
           EOF
-          
           chmod +x gradlew
 
       - name: Build APK with Gradle
         run: |
           cd android
-          # SDK 35 እንዲወርድ ፍቃድ መስጠት
-          yes | sdkmanager --licenses || true
+          # የስህተት ምንጭ የነበረውን sdkmanager መስመር አስወግደነዋል
           ./gradlew assembleDebug
 
       - name: Upload Finished APK
