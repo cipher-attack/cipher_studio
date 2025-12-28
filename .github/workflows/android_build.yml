@@ -35,12 +35,22 @@ jobs:
           npx cap sync android
 
       - name: Force Java 17 Compatibility
-        # ይህ ክፍል "invalid source release 21" የሚለውን ስህተት ይከላከላል
         run: |
           cd android
-          find . -name "build.gradle" -exec sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' {} +
-          find . -name "build.gradle" -exec sed -i 's/targetCompatibility 21/targetCompatibility 17/g' {} +
-          find . -name "build.gradle" -exec sed -i 's/sourceCompatibility 21/sourceCompatibility 17/g' {} +
+          # Capacitor 6 ውስጥ ያለውን የ javaVersion ተለዋዋጭ ወደ 17 እንቀይረው
+          if [ -f variables.gradle ]; then
+            sed -i "s/javaVersion = '21'/javaVersion = '17'/g" variables.gradle
+            sed -i "s/javaVersion = 21/javaVersion = 17/g" variables.gradle
+          fi
+          
+          # በሁሉም የ build.gradle ፋይሎች ውስጥ 21 የሚለውን ወደ 17 እንቀይር
+          find . -type f -name "*.gradle" -exec sed -i 's/VERSION_21/VERSION_17/g' {} +
+          find . -type f -name "*.gradle" -exec sed -i 's/JavaVersion.21/JavaVersion.17/g' {} +
+          find . -type f -name "*.gradle" -exec sed -i 's/sourceCompatibility 21/sourceCompatibility 17/g' {} +
+          find . -type f -name "*.gradle" -exec sed -i 's/targetCompatibility 21/targetCompatibility 17/g' {} +
+          find . -type f -name "*.gradle" -exec sed -i 's/sourceCompatibility = 21/sourceCompatibility = 17/g' {} +
+          find . -type f -name "*.gradle" -exec sed -i 's/targetCompatibility = 21/targetCompatibility = 17/g' {} +
+          
           chmod +x gradlew
 
       - name: Build APK with Gradle
