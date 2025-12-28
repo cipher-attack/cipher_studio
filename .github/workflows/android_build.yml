@@ -34,13 +34,18 @@ jobs:
           find . -name "google-services.json" -exec cp {} android/app/ \;
           npx cap sync android
 
-      - name: Upgrade Gradle and SDK for Java 21 Compatibility
+      - name: Setup Android SDK 35 (Crucial Fix)
+        run: |
+          # API 35 እና Build Tools 35 ን በሃይል እንጫን
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Upgrade Gradle and SDK Variables
         run: |
           cd android
-          # 1. Gradle ን ወደ 8.10 እናሳድግ (ለ Java 21 እንዲመች)
+          # 1. Gradle 8.10 (Java 21 ን ሙሉ ለሙሉ ይደግፋል)
           sed -i 's/gradle-.*-all.zip/gradle-8.10-all.zip/g' gradle/wrapper/gradle-wrapper.properties
           
-          # 2. ሁሉንም አስፈላጊ ተለዋዋጮች የያዘ variables.gradle ፋይል እንፍጠር
+          # 2. variables.gradle ን ማስተካከል
           cat > variables.gradle <<EOF
           ext {
               minSdkVersion = 22
@@ -60,13 +65,19 @@ jobs:
               cordovaAndroidVersion = '10.1.1'
           }
           EOF
+          
+          # 3. የ jlink ስህተትን ለማስቀረት Gradle properties ላይ ማስተካከያ ማድረግ
+          echo "android.nonTransitiveRClass=true" >> gradle.properties
+          echo "org.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m" >> gradle.properties
+          
           chmod +x gradlew
 
       - name: Build APK with Gradle
         run: |
           cd android
-          # የስህተት ምንጭ የነበረውን sdkmanager መስመር አስወግደነዋል
-          ./gradlew assembleDebug
+          # በድጋሚ ፍቃዶችን ማረጋገጥ
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          ./gradlew assembleDebug --stacktrace
 
       - name: Upload Finished APK
         uses: actions/upload-artifact@v4
