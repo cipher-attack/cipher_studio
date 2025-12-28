@@ -8,10 +8,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
 
       - name: Set up Node.js
@@ -34,32 +34,38 @@ jobs:
           find . -name "google-services.json" -exec cp {} android/app/ \;
           npx cap sync android
 
-      - name: Force Java 17 (Deep Patch)
+      - name: Upgrade Gradle and SDK for Java 21 Compatibility
         run: |
-          # 1. በ node_modules ውስጥ ያለውን የ Capacitor ላይብረሪ ወደ 17 እንቀይር
-          echo "Patching node_modules..."
-          find node_modules/@capacitor/android -type f -name "*.gradle" -exec sed -i 's/VERSION_21/VERSION_17/g' {} +
-          find node_modules/@capacitor/android -type f -name "*.gradle" -exec sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' {} +
-
-          # 2. በ android ፎልደር ውስጥ ያሉትን ፋይሎች በሙሉ ወደ 17 እንቀይር
-          echo "Patching android folder..."
           cd android
-          find . -type f -name "*.gradle" -exec sed -i 's/VERSION_21/VERSION_17/g' {} +
-          find . -type f -name "*.gradle" -exec sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' {} +
-          find . -type f -name "*.gradle" -exec sed -i 's/sourceCompatibility 21/sourceCompatibility 17/g' {} +
-          find . -type f -name "*.gradle" -exec sed -i 's/targetCompatibility 21/targetCompatibility 17/g' {} +
+          # 1. Gradle ን ወደ 8.10 እናሳድግ (ይህ Java 21 ን ይደግፋል)
+          sed -i 's/gradle-.*-all.zip/gradle-8.10-all.zip/g' gradle/wrapper/gradle-wrapper.properties
           
-          # variables.gradle ካለ እሱንም መቀየር
-          if [ -f variables.gradle ]; then
-            sed -i "s/javaVersion = '21'/javaVersion = '17'/g" variables.gradle
-            sed -i "s/javaVersion = 21/javaVersion = 17/g" variables.gradle
-          fi
+          # 2. API 35 (VANILLA_ICE_CREAM) እንዲያውቅ variables.gradle ን እናስተካክል
+          cat > variables.gradle <<EOF
+          ext {
+              minSdkVersion = 22
+              compileSdkVersion = 35
+              targetSdkVersion = 35
+              androidxActivityVersion = '1.9.2'
+              androidxAppCompatVersion = '1.7.0'
+              androidxCoordinatorLayoutVersion = '1.2.0'
+              androidxCoreVersion = '1.13.1'
+              androidxFragmentVersion = '1.8.3'
+              junitVersion = '4.13.2'
+              androidxJunitVersion = '1.2.1'
+              androidxEspressoCoreVersion = '3.6.1'
+              cordovaAndroidVersion = '10.1.1'
+              javaVersion = JavaVersion.VERSION_21
+          }
+          EOF
           
           chmod +x gradlew
 
       - name: Build APK with Gradle
         run: |
           cd android
+          # SDK 35 እንዲወርድ ፍቃድ መስጠት
+          yes | sdkmanager --licenses || true
           ./gradlew assembleDebug
 
       - name: Upload Finished APK
