@@ -34,13 +34,14 @@ jobs:
           find . -name "google-services.json" -exec cp {} android/app/ \;
           npx cap sync android
 
-      - name: Force Upgrade Gradle (For Java 21)
+      - name: Force Upgrade Gradle (Text Edit Method)
         run: |
           cd android
+          # gradlew ን ከመክፈታችን በፊት የ Gradle version ን በፋይል ውስጥ ብቻ እንቀይረው
+          # ይህ ዘዴ Gradle ራሱን ሳይከፍት እንዲቀየር ያደርገዋል (Java 21 error እንዳይመጣ)
+          sed -i 's/gradle-.*-all.zip/gradle-8.5-all.zip/g' gradle/wrapper/gradle-wrapper.properties
+          sed -i 's/gradle-.*-bin.zip/gradle-8.5-all.zip/g' gradle/wrapper/gradle-wrapper.properties
           chmod +x gradlew
-          # Java 21 ን እንዲቀበል Gradle ን ወደ 8.5 ከፍ ማድረግ
-          ./gradlew wrapper --gradle-version 8.5 --distribution-type all
-          ./gradlew --version
 
       - name: Build APK with Gradle
         run: |
