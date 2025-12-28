@@ -34,22 +34,26 @@ jobs:
           find . -name "google-services.json" -exec cp {} android/app/ \;
           npx cap sync android
 
-      - name: Force Java 17 Compatibility
+      - name: Force Java 17 (Deep Patch)
         run: |
+          # 1. በ node_modules ውስጥ ያለውን የ Capacitor ላይብረሪ ወደ 17 እንቀይር
+          echo "Patching node_modules..."
+          find node_modules/@capacitor/android -type f -name "*.gradle" -exec sed -i 's/VERSION_21/VERSION_17/g' {} +
+          find node_modules/@capacitor/android -type f -name "*.gradle" -exec sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' {} +
+
+          # 2. በ android ፎልደር ውስጥ ያሉትን ፋይሎች በሙሉ ወደ 17 እንቀይር
+          echo "Patching android folder..."
           cd android
-          # Capacitor 6 ውስጥ ያለውን የ javaVersion ተለዋዋጭ ወደ 17 እንቀይረው
+          find . -type f -name "*.gradle" -exec sed -i 's/VERSION_21/VERSION_17/g' {} +
+          find . -type f -name "*.gradle" -exec sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' {} +
+          find . -type f -name "*.gradle" -exec sed -i 's/sourceCompatibility 21/sourceCompatibility 17/g' {} +
+          find . -type f -name "*.gradle" -exec sed -i 's/targetCompatibility 21/targetCompatibility 17/g' {} +
+          
+          # variables.gradle ካለ እሱንም መቀየር
           if [ -f variables.gradle ]; then
             sed -i "s/javaVersion = '21'/javaVersion = '17'/g" variables.gradle
             sed -i "s/javaVersion = 21/javaVersion = 17/g" variables.gradle
           fi
-          
-          # በሁሉም የ build.gradle ፋይሎች ውስጥ 21 የሚለውን ወደ 17 እንቀይር
-          find . -type f -name "*.gradle" -exec sed -i 's/VERSION_21/VERSION_17/g' {} +
-          find . -type f -name "*.gradle" -exec sed -i 's/JavaVersion.21/JavaVersion.17/g' {} +
-          find . -type f -name "*.gradle" -exec sed -i 's/sourceCompatibility 21/sourceCompatibility 17/g' {} +
-          find . -type f -name "*.gradle" -exec sed -i 's/targetCompatibility 21/targetCompatibility 17/g' {} +
-          find . -type f -name "*.gradle" -exec sed -i 's/sourceCompatibility = 21/sourceCompatibility = 17/g' {} +
-          find . -type f -name "*.gradle" -exec sed -i 's/targetCompatibility = 21/targetCompatibility = 17/g' {} +
           
           chmod +x gradlew
 
