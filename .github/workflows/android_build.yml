@@ -34,18 +34,20 @@ jobs:
           find . -name "google-services.json" -exec cp {} android/app/ \;
           npx cap sync android
 
-      - name: Setup Android SDK 35 (Crucial Fix)
-        run: |
-          # API 35 እና Build Tools 35 ን በሃይል እንጫን
-          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-35" "build-tools;35.0.0"
-
-      - name: Upgrade Gradle and SDK Variables
+      - name: Upgrade Gradle and Patch Jlink Error
         run: |
           cd android
-          # 1. Gradle 8.10 (Java 21 ን ሙሉ ለሙሉ ይደግፋል)
+          # 1. Gradle ን ወደ 8.10 እናሳድግ
           sed -i 's/gradle-.*-all.zip/gradle-8.10-all.zip/g' gradle/wrapper/gradle-wrapper.properties
           
-          # 2. variables.gradle ን ማስተካከል
+          # 2. የ Android Gradle Plugin (AGP) ስሪትን እናሳድግ (ለ Java 21 እንዲመች)
+          sed -i 's/com.android.tools.build:gradle:8.[0-9].[0-9]/com.android.tools.build:gradle:8.7.2/g' build.gradle
+          
+          # 3. ዋናው መፍትሄ (FIX): የ jlink ትራንስፎርሜሽንን ማጥፋት
+          # ይህ ትዕዛዝ አሁን ያየኸውን የ "jlink finished with non-zero exit value 1" ስህተት ያስቀረዋል
+          echo "android.jdk.image.transformation.enabled=false" >> gradle.properties
+          
+          # 4. SDK 35 ተለዋዋጮችን ማስተካከል
           cat > variables.gradle <<EOF
           ext {
               minSdkVersion = 22
@@ -65,18 +67,14 @@ jobs:
               cordovaAndroidVersion = '10.1.1'
           }
           EOF
-          
-          # 3. የ jlink ስህተትን ለማስቀረት Gradle properties ላይ ማስተካከያ ማድረግ
-          echo "android.nonTransitiveRClass=true" >> gradle.properties
-          echo "org.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m" >> gradle.properties
-          
           chmod +x gradlew
 
       - name: Build APK with Gradle
         run: |
           cd android
-          # በድጋሚ ፍቃዶችን ማረጋገጥ
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          # አስፈላጊ የሆኑ የ SDK ፍቃዶችን መቀበል
+          yes | sdkmanager --licenses || true
+          # Build ማድረግ (ከነ stacktrace ለበለጠ መረጃ)
           ./gradlew assembleDebug --stacktrace
 
       - name: Upload Finished APK
